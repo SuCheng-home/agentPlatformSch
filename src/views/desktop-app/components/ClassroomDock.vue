@@ -55,7 +55,8 @@
           type="button"
           class="cls-tab"
           :class="{ on: activeKey === type.key }"
-          :aria-pressed="activeKey === type.key"
+          :aria-pressed="isDirect(type.key) ? null : activeKey === type.key"
+          :title="tabTitle(type)"
           @click="toggle(type.key)"
         >
           <span class="cls-tab-ico" :class="'tone-' + type.tone">
@@ -70,7 +71,7 @@
 
 <script>
 import { ICONS } from '@/constants/icons';
-import { PACKAGES, RESOURCE_TYPES, getPackage } from '@/data/teaching/packages';
+import { PACKAGES, RESOURCE_TYPES, CLASSROOM_TYPES, getPackage } from '@/data/teaching/packages';
 import ResourcePanel from '@/components/teaching/resource-panel.vue';
 import ResIcon from '@/components/teaching/res-icon.vue';
 
@@ -87,7 +88,7 @@ export default {
     return {
       icons: ICONS,
       packages: PACKAGES,
-      resourceTypes: RESOURCE_TYPES,
+      resourceTypes: CLASSROOM_TYPES,
       currentId: (getPackage(this.packageId) || PACKAGES[0]).id,
       activeKey: '',
       pickerOpen: false
@@ -115,8 +116,22 @@ export default {
     document.removeEventListener('keydown', this.onKeydown);
   },
   methods: {
+    /** 智能体与工具每个课程包只有一个，点击直接打开对话 / 工具，不经过列表 */
+    isDirect(key) {
+      return key === 'agents' || key === 'tools';
+    },
+    tabTitle(type) {
+      if (type.key === 'agents') return `打开智能体：${this.pkg.agent.name}`;
+      if (type.key === 'tools') return `打开工具：${this.pkg.tool.name}`;
+      return type.label;
+    },
     toggle(key) {
       this.pickerOpen = false;
+      if (this.isDirect(key)) {
+        const app = key === 'agents' ? this.pkg.agent : this.pkg.tool;
+        this.$emit('open-app', { id: app.id, name: app.name });
+        return;
+      }
       this.activeKey = this.activeKey === key ? '' : key;
     },
     choosePackage(id) {

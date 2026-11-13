@@ -91,24 +91,91 @@
       </section>
     </div>
 
-    <!-- 智能体 / AI 工具：来自平台，点击直接调起平台预览 -->
+    <!-- 智能体 / AI 工具：展示平台中的完整配置，老师可复制人设、知识库、提示词去二次创作 -->
     <div v-else-if="type === 'agents' || type === 'tools'" class="rp-apps">
+      <header class="rp-app-head">
+        <ResIcon :icon="isAgent ? 'bot' : 'wand'" :tone="isAgent ? 'violet' : 'indigo'" :size="22" :box="48" />
+        <div class="rp-app-copy">
+          <b>{{ app.name }}</b>
+          <small>{{ app.usage }}</small>
+          <span class="rp-app-src">来自平台「智能体广场」</span>
+        </div>
+        <div class="rp-app-actions">
+          <button type="button" class="rp-btn ghost" @click="copy(fullConfig, isAgent ? '全部配置' : '提示词')">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path :d="icons.copy" /></svg>
+            {{ isAgent ? '复制全部配置' : '复制提示词' }}
+          </button>
+          <button type="button" class="rp-btn" @click="$emit('open-app', app)">
+            打开试用
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path :d="icons.chevronRight" /></svg>
+          </button>
+        </div>
+      </header>
+
+      <template v-if="isAgent">
+        <section class="rp-block">
+          <div class="rp-block-head">
+            <h4>开场白</h4>
+            <button type="button" class="rp-copy" @click="copy(app.opening, '开场白')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path :d="icons.copy" /></svg>
+              复制
+            </button>
+          </div>
+          <p class="rp-quote">{{ app.opening }}</p>
+        </section>
+
+        <section class="rp-block">
+          <div class="rp-block-head">
+            <h4>人设与回复逻辑</h4>
+            <button type="button" class="rp-copy" @click="copy(app.persona, '人设与回复逻辑')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path :d="icons.copy" /></svg>
+              复制
+            </button>
+          </div>
+          <pre class="rp-pre">{{ app.persona }}</pre>
+        </section>
+
+        <section class="rp-block">
+          <div class="rp-block-head">
+            <h4>知识库 <span class="rp-count">{{ app.knowledge.length }} 份</span></h4>
+            <button type="button" class="rp-copy" @click="copy(knowledgeText, '全部知识库')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path :d="icons.copy" /></svg>
+              复制全部
+            </button>
+          </div>
+          <ul class="rp-kb">
+            <li v-for="(doc, i) in app.knowledge" :key="i" class="rp-kb-item">
+              <div class="rp-kb-head">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path :d="icons.fileText" /></svg>
+                <b>{{ doc.name }}</b>
+                <em>{{ doc.kind }}</em>
+                <button type="button" class="rp-copy" :aria-label="'复制' + doc.name" @click="copy(doc.content, doc.name)">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path :d="icons.copy" /></svg>
+                  复制
+                </button>
+              </div>
+              <p>{{ doc.content }}</p>
+            </li>
+          </ul>
+        </section>
+      </template>
+
+      <section v-else class="rp-block">
+        <div class="rp-block-head">
+          <h4>提示词</h4>
+          <button type="button" class="rp-copy" @click="copy(app.prompt, '提示词')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path :d="icons.copy" /></svg>
+            复制
+          </button>
+        </div>
+        <pre class="rp-pre">{{ app.prompt }}</pre>
+      </section>
+
       <p class="rp-apps-tip">
-        以下{{ type === 'agents' ? '智能体' : '工具' }}来自平台「智能体广场」，点击即可在课堂中直接打开使用。
+        {{ isAgent
+          ? '复制后在平台「我的智能体 › 新建智能体」中粘贴人设与开场白、上传知识库，即可改编成自己的版本。'
+          : '复制提示词后在平台「AI 工具生成」中粘贴并按需修改，即可生成适合自己班级的新工具。' }}
       </p>
-      <div class="rp-app-grid">
-        <button v-for="item in appItems" :key="item.id" type="button" class="rp-app" @click="$emit('open-app', item)">
-          <ResIcon :icon="type === 'agents' ? 'bot' : 'wand'" :tone="type === 'agents' ? 'violet' : 'indigo'" :size="22" :box="46" />
-          <span class="rp-app-copy">
-            <b>{{ item.name }}</b>
-            <small>{{ item.usage }}</small>
-          </span>
-          <span class="rp-app-open">
-            打开
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path :d="icons.chevronRight" /></svg>
-          </span>
-        </button>
-      </div>
     </div>
 
     <!-- 学习任务单 -->
@@ -152,6 +219,7 @@
 
 <script>
 import { ICONS } from '@/constants/icons';
+import { copyText } from '@/utils/clipboard';
 import SlideView from './slide-view.vue';
 import ResIcon from './res-icon.vue';
 
@@ -178,8 +246,24 @@ export default {
     currentSlide() {
       return this.pkg.slides[this.slideIndex] || this.pkg.slides[0];
     },
-    appItems() {
-      return this.type === 'agents' ? this.pkg.agents : this.pkg.tools;
+    isAgent() {
+      return this.type === 'agents';
+    },
+    app() {
+      return this.isAgent ? this.pkg.agent : this.pkg.tool;
+    },
+    knowledgeText() {
+      return this.pkg.agent.knowledge.map((doc) => `【${doc.name}】\n${doc.content}`).join('\n\n');
+    },
+    fullConfig() {
+      if (!this.isAgent) return this.pkg.tool.prompt;
+      const agent = this.pkg.agent;
+      return [
+        `【智能体名称】${agent.name}`,
+        `【开场白】\n${agent.opening}`,
+        `【人设与回复逻辑】\n${agent.persona}`,
+        `【知识库】\n${this.knowledgeText}`
+      ].join('\n\n');
     },
     answeredCount() {
       return Object.keys(this.answers).length;
@@ -193,6 +277,14 @@ export default {
     }
   },
   methods: {
+    async copy(text, label) {
+      const ok = await copyText(text);
+      if (ok) {
+        this.$message.success(`已复制${label}`);
+      } else {
+        this.$message.error('复制失败，请手动选择文本复制');
+      }
+    },
     choose(questionIndex, optionIndex) {
       if (this.answers[questionIndex] !== undefined) return;
       this.$set(this.answers, questionIndex, optionIndex);
@@ -368,26 +460,86 @@ export default {
 /* 智能体 / 工具 */
 .rp-apps { display: flex; flex-direction: column; gap: 14px; }
 .rp-apps-tip { margin: 0; color: var(--muted); font-size: 13px; }
-.rp-app-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
-.rp-app {
+.rp-app-head {
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 16px;
+  padding: 16px 18px;
   border: 1px solid var(--line);
   border-radius: 12px;
   background: var(--surface);
-  text-align: left;
-  font: inherit;
-  color: inherit;
-  cursor: pointer;
-  transition: border-color .15s, box-shadow .15s;
 }
-.rp-app:hover { border-color: var(--primary); box-shadow: 0 6px 18px rgba(33, 104, 243, .12); }
 .rp-app-copy { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-.rp-app-copy b { font-size: 15px; }
+.rp-app-copy b { font-size: 16px; }
 .rp-app-copy small { font-size: 13px; color: var(--muted); line-height: 1.5; }
-.rp-app-open { flex: none; display: inline-flex; align-items: center; gap: 2px; font-size: 13px; font-weight: 600; color: var(--primary); }
+.rp-app-src { align-self: flex-start; margin-top: 4px; font-size: 12px; color: var(--primary); background: var(--soft); padding: 1px 8px; border-radius: 6px; }
+.rp-app-actions { flex: none; display: flex; gap: 8px; }
+
+.rp-block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 18px 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+}
+.rp-block-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.rp-block-head h4 { margin: 0; font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.rp-count { font-size: 12px; font-weight: 400; color: var(--muted); }
+.rp-copy {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--surface);
+  font: inherit;
+  font-size: 12px;
+  color: #53617a;
+  cursor: pointer;
+}
+.rp-copy:hover { border-color: var(--primary); color: var(--primary); }
+.rp-quote {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 9px;
+  background: var(--canvas);
+  color: var(--ink);
+}
+.rp-pre {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 9px;
+  background: var(--canvas);
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.7;
+  color: #2b3954;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 320px;
+  overflow-y: auto;
+}
+.rp-kb { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.rp-kb-item { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border-radius: 9px; background: var(--canvas); }
+.rp-kb-head { display: flex; align-items: center; gap: 8px; color: var(--primary); }
+.rp-kb-head b { color: var(--ink); font-size: 14px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rp-kb-head em { font-style: normal; font-size: 11px; color: var(--muted); background: var(--surface); padding: 0 6px; border-radius: 5px; }
+.rp-kb-head .rp-copy { margin-left: auto; height: 26px; }
+.rp-kb-item p {
+  margin: 0;
+  font-size: 13px;
+  color: #53617a;
+  white-space: pre-line;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 
 /* 练习 */
 .rp-quiz { display: flex; flex-direction: column; gap: 14px; }
@@ -446,6 +598,8 @@ export default {
   .rp-slides { flex-direction: column-reverse; }
   .rp-thumbs { width: auto; flex-direction: row; max-height: none; overflow-x: auto; }
   .rp-thumb { flex: none; width: 120px; }
+  .rp-app-head { flex-wrap: wrap; }
+  .rp-app-actions { width: 100%; }
   .rp-options,
   .rp-doc-grid { grid-template-columns: 1fr; }
 }

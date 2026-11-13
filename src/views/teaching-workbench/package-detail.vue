@@ -43,7 +43,7 @@
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path :d="icons.monitor" /></svg>
           带着课程包去上课
         </button>
-        <small>ZIP 包含可编辑的课件、教案、任务单、练习与智能体清单</small>
+        <small>ZIP 包含可编辑的课件、教案、任务单、练习，以及智能体人设、知识库与工具提示词</small>
       </div>
     </header>
 
@@ -77,7 +77,7 @@
             </button>
           </li>
         </ul>
-        <p class="pd-res-foot">勾选资源后可一键打包。文档导出为可用 Word / WPS 直接打开改编的 HTML，智能体与工具导出为平台链接清单；课程视频接入后提供下载地址。</p>
+        <p class="pd-res-foot">勾选资源后可一键打包。文档导出为可用 Word / WPS 直接打开改编的 HTML，智能体导出人设与知识库、工具导出提示词，可直接复制去二次创作；教案与任务单仅用于备课，不出现在课堂切换栏。</p>
       </aside>
     </section>
 
@@ -153,8 +153,8 @@ export default {
       switch (key) {
         case 'video': return pkg.video.url ? pkg.video.duration : '待接入';
         case 'slides': return `${pkg.slides.length} 页`;
-        case 'agents': return `${pkg.agents.length} 个`;
-        case 'tools': return `${pkg.tools.length} 个`;
+        case 'agents': return '人设 · 知识库';
+        case 'tools': return '提示词';
         case 'exercises': return `${pkg.exercises.length} 题`;
         default: return '';
       }

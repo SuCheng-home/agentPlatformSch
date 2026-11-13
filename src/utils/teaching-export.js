@@ -109,13 +109,46 @@ export function platformShareUrl(id) {
   return `${origin}${pathname}#/agent-share?id=${encodeURIComponent(id)}`;
 }
 
-function buildPlatformManifest(pkg, key) {
-  const source = key === 'agents' ? pkg.agents : pkg.tools;
-  return JSON.stringify({
-    package: pkg.title,
-    type: key === 'agents' ? '智能体问答' : 'AI 教学工具',
-    items: source.map((item) => ({ id: item.id, name: item.name, usage: item.usage, url: platformShareUrl(item.id) }))
-  }, null, 2);
+/** 智能体配置：人设、开场白、知识库全部以纯文本给出，方便老师复制到平台二次创作 */
+function buildAgentConfig(pkg) {
+  const agent = pkg.agent;
+  const knowledge = agent.knowledge.map((doc) => `### ${doc.name}（${doc.kind}）\n\n${doc.content}`).join('\n\n');
+  return [
+    `# ${agent.name} · 智能体配置`,
+    '',
+    `所属课程包：${pkg.title}`,
+    `用途：${agent.usage}`,
+    `平台地址：${platformShareUrl(agent.id)}`,
+    '',
+    '## 开场白',
+    '',
+    agent.opening,
+    '',
+    '## 人设与回复逻辑',
+    '',
+    agent.persona,
+    '',
+    '## 知识库',
+    '',
+    knowledge,
+    ''
+  ].join('\n');
+}
+
+function buildToolConfig(pkg) {
+  const tool = pkg.tool;
+  return [
+    `# ${tool.name} · 工具提示词`,
+    '',
+    `所属课程包：${pkg.title}`,
+    `用途：${tool.usage}`,
+    `平台地址：${platformShareUrl(tool.id)}`,
+    '',
+    '## 提示词',
+    '',
+    tool.prompt,
+    ''
+  ].join('\n');
 }
 
 function buildVideoNote(pkg) {
@@ -137,9 +170,9 @@ function buildResourceFile(pkg, key) {
     case 'design':
       return { name: '03-教学设计.html', content: buildDesign(pkg), mime: 'text/html' };
     case 'agents':
-      return { name: '04-智能体问答.json', content: buildPlatformManifest(pkg, 'agents'), mime: 'application/json' };
+      return { name: '04-智能体配置（人设与知识库）.md', content: buildAgentConfig(pkg), mime: 'text/markdown' };
     case 'tools':
-      return { name: '05-AI教学工具.json', content: buildPlatformManifest(pkg, 'tools'), mime: 'application/json' };
+      return { name: '05-AI教学工具提示词.md', content: buildToolConfig(pkg), mime: 'text/markdown' };
     case 'taskSheet':
       return { name: '06-学习任务单.html', content: buildTaskSheet(pkg), mime: 'text/html' };
     case 'exercises':
@@ -162,7 +195,8 @@ function buildReadme(pkg, keys) {
     '',
     '## 如何改编',
     '- .html 文档可直接用 Word / WPS 打开，另存为 .docx 后自由修改。',
-    '- 智能体与工具清单中的链接可回到平台直接使用，也可以在平台中复制后二次创作。',
+    '- 智能体配置包含人设、开场白与知识库，可粘贴到平台「新建智能体」中改编成自己的版本。',
+    '- 工具提示词可粘贴到平台「AI 工具生成」中修改后重新生成。',
     ''
   ].join('\n');
 }
