@@ -1,7 +1,24 @@
+import { existsSync } from 'node:fs';
 import { fileURLToPath, URL } from 'node:url';
 import { defineConfig, loadEnv } from 'vite';
 import vue2 from '@vitejs/plugin-vue2';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
+
+const resolveLocal = (path) => fileURLToPath(new URL(path, import.meta.url));
+
+// auth-layout-* 只发布在内网 npm 仓库；外网环境（v0 预览、CI）安装不到时改用 src/shims 下的替身，
+// 内网安装了真实包时不做任何替换。
+const hasPrivateAuthPackages = existsSync(resolveLocal('./node_modules/auth-layout-wxj/package.json'));
+const privatePackageShims = hasPrivateAuthPackages
+  ? []
+  : [
+      { find: /^auth-layout-wxj\/initEnv$/, replacement: resolveLocal('./src/shims/auth-layout-wxj/initEnv.js') },
+      { find: /^auth-layout-wxj$/, replacement: resolveLocal('./src/shims/auth-layout-wxj/index.js') },
+      {
+        find: /^auth-layout-components\/dist\/index\/style\.css$/,
+        replacement: resolveLocal('./src/shims/auth-layout-components/style.css')
+      }
+    ];
 
 export default defineConfig(({ mode, command }) => {
   const env = loadEnv(mode, process.cwd(), '');
@@ -27,11 +44,12 @@ export default defineConfig(({ mode, command }) => {
     ],
 
     resolve: {
-      alias: {
-        '@': fileURLToPath(new URL('./src', import.meta.url)),
+      alias: [
+        ...privatePackageShims,
+        { find: '@', replacement: resolveLocal('./src') },
         // 指向 ESM 版本，支持运行时模板编译
-        vue: 'vue/dist/vue.esm.js'
-      },
+        { find: /^vue$/, replacement: 'vue/dist/vue.esm.js' }
+      ],
       extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.vue']
     },
 
@@ -60,8 +78,8 @@ export default defineConfig(({ mode, command }) => {
       headers: env.VITE_USE_MOCK === 'true'
         ? { 'Content-Security-Policy': "connect-src 'self' ws: wss:; frame-src 'none'; img-src 'self' data: blob:" }
         : {},
-      // 允许通过 127.0.0.1、localhost 等本地地址访问开发服务器
-      allowedHosts: ['localhost', '127.0.0.1']
+      // 允许本地地址及 v0 在线预览域名访问开发服务器
+      allowedHosts: ['localhost', '127.0.0.1', '.vercel.run', '.v0.build']
     },
 
     build: {
