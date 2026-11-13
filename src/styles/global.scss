@@ -1,0 +1,41 @@
+/* 全局设计变量与基础样式 */
+:root {
+  --primary: #2168f3;
+  --primary-dark: #1553d4;
+  --ink: #13213d;
+  --muted: #6f7d98;
+  --line: #e5ebf5;
+  --surface: #fff;
+  --canvas: #f5f8fe;
+  --soft: #edf3ff;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  background: var(--canvas);
+  color: var(--ink);
+  line-height: 1.6;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* 图标基类：行内对齐，供各组件内联 SVG 复用 */
+.icon {
+  display: inline-block;
+  vertical-align: middle;
+}

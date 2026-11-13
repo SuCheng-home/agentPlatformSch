@@ -1,0 +1,29 @@
+{
+  "sourceUrl": "https://www.zhxiaoyuan.cn/agentPlatformSch/#/desktop-app",
+  "capturedAt": "2026-11-13T15:05:09+08:00",
+  "agentCount": 161,
+  "bannerCount": 2,
+  "schoolIds": [
+    191,
+    448,
+    688,
+    1249
+  ],
+  "scope": "链接未限定学校，采集公开列表全量数据；不代表单个学校或当前登录用户的数据。",
+  "localImageCount": 133,
+  "failures": [
+    {
+      "url": "https://cdnfile-10043692.file.myqcloud.com/wxcep/default_avatar.png",
+      "reason": "HTTP Error 404: Not Found"
+    }
+  ],
+  "status": {
+    "list": "已采集完整分页快照",
+    "details": "复用公开列表完整展示字段，未执行外部应用",
+    "filters": "已采集公开学科与现有资源对应的教材、章节",
+    "personalData": "未采集私人收藏、使用记录或草稿；由本地交互产生",
+    "platformSettings": "未取得学校平台配置，保留原有默认名称与标识",
+    "uploadsAndAi": "未接入，本地模式不调用上传服务或第三方 AI"
+  },
+  "defaultLogo": "/mock-assets/623c02554f1f63095f72.jpg"
+}
