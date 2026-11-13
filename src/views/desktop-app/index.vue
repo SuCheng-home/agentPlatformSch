@@ -146,6 +146,14 @@
       </transition>
     </div>
 
+    <!-- 左下角课堂资源：切换课程包内的视频 / 课件 / 工具 / 智能体 / 练习，智能体与工具调起平台预览 -->
+    <ClassroomDock
+      v-if="showWorkbar"
+      :package-id="launchPackageId"
+      :hidden="dockOpen"
+      @open-app="openFull"
+    />
+
     <!-- 全屏预览（组件自治显隐） -->
     <AppPreview ref="preview" floatingToolbar @close="handlePreviewClose" @favorite="handleFavorite" />
 
@@ -212,6 +220,7 @@ import { MOCK_DATA_ENABLED } from '@/config/local-preview';
 import LocalPreviewNotice from '@/components/local-preview-notice.vue';
 import AppPreview from '@/components/app-preview.vue';
 import QrcodeLogin from './components/QrcodeLogin.vue';
+import ClassroomDock from './components/ClassroomDock.vue';
 import { formatUses } from '@/utils/format';
 import { getLaunchParam as readLaunchParam } from '@/utils/launchParams';
 import { mapState, mapGetters } from 'vuex';
@@ -246,6 +255,7 @@ export default {
   components: {
     AppPreview,
     QrcodeLogin,
+    ClassroomDock,
     LocalPreviewNotice
   },
   data() {
@@ -286,6 +296,10 @@ export default {
   computed: {
     isMockMode() {
       return MOCK_DATA_ENABLED;
+    },
+    /** 教学工作台「去上课」带入的课程包 id */
+    launchPackageId() {
+      return String(this.$route.query.package || '');
     },
     ...mapGetters('agent', ['subjectList', 'platformName', 'platformLogo']),
     ...mapState('agent', ['page', 'filters', 'agents', 'total', 'guestMode', 'loading']),

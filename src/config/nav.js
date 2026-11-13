@@ -3,6 +3,7 @@
 export const NAV_PAGES = [
   { key: 'home', title: '首页', icon: 'home' },
   { key: 'agents', title: '智能体广场', icon: 'agents' },
+  { key: 'teaching', title: '教学工作台', icon: 'teaching' },
   // { key: 'tools', title: '实用工具', icon: 'tools' },
   { key: 'favorites', title: '我的收藏', icon: 'heart', badge: 'favorite' },
   { key: 'created', title: '我创建的', icon: 'users' },

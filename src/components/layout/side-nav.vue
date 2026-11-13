@@ -230,7 +230,7 @@ export default {
       return isShowByPermission(item.permission);
     },
     isActive(key) {
-      return this.$route.name === key;
+      return this.$route.name === key || (this.$route.meta && this.$route.meta.navKey === key);
     },
     isExpanded(key) {
       return !!this.expanded[key];

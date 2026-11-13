@@ -7,10 +7,13 @@ import PlatformSet from '@/views/platform-set/index.vue';
 import DesktopApp from '@/views/desktop-app/index.vue';
 import AgentShare from '@/views/agent-share/index.vue';
 import Manual from '@/views/manual/index.vue';
+import TeachingWorkbench from '@/views/teaching-workbench/index.vue';
+import TeachingPackageDetail from '@/views/teaching-workbench/package-detail.vue';
 import { NAV_PAGES } from '@/config/nav';
 
 // 特定导航项对应的独立页面组件；未列出的导航项复用「智能体广场」视图
 const PAGE_COMPONENT_MAP = {
+  teaching: TeachingWorkbench,
   approve: AgentApprove,
   manage: AgentManage,
   banner: BannerManage,
@@ -43,6 +46,13 @@ const routes = [
     redirect: '/home',
     children: [
       ...navRoutes,
+      // 课程包详情：归属「教学工作台」菜单（navKey 用于侧栏高亮）
+      {
+        path: 'teaching/package/:id',
+        name: 'teaching-package',
+        component: TeachingPackageDetail,
+        meta: { title: '课程包详情', page: 'teaching-package', navKey: 'teaching', requireAuth: true }
+      },
       // 平台使用手册：固定在侧栏底部的菜单页，iframe 内嵌在线文档
       {
         path: 'manual',
