@@ -2,7 +2,7 @@
   <div class="klh klh-shell">
     <header class="klh-top">
       <div class="klh-top__inner">
-        <router-link to="/kelihua/subject" class="klh-top__brand" aria-label="科智汇 AI 矩阵平台首页">
+        <router-link to="/kelihua/home" class="klh-top__brand" aria-label="科智汇 AI 矩阵平台首页">
           <img :src="logo" alt="" width="36" height="36" />
           <span class="klh-brush brand-zh">科智汇</span>
           <span class="brand-sub">AI 矩阵平台</span>
@@ -71,6 +71,7 @@ export default {
     },
     navItems() {
       const items = [
+        { to: '/kelihua/home', label: '首页' },
         { to: '/kelihua/subject', label: '学科 AI 矩阵' },
         { to: '/kelihua/education', label: '育人管理矩阵' },
         { to: '/kelihua/course', label: '学程案例矩阵' },

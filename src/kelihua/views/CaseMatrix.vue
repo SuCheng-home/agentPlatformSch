@@ -107,10 +107,10 @@
                 </li>
               </ul>
             </div>
-            <button type="button" class="klh-btn klh-btn--sm lesson__enter" @click="enter(l)">
+            <router-link :to="`/kelihua/lesson/${active.id}-l${i}`" class="klh-btn klh-btn--sm lesson__enter">
               进入本课
               <klh-icon name="arrowRight" :size="14" />
-            </button>
+            </router-link>
           </li>
         </ol>
       </section>
@@ -173,9 +173,6 @@ export default {
     setGrade(g) {
       this.grade = g;
       this.activeId = null;
-    },
-    enter(l) {
-      this.$message({ message: `「${l.title}」课例资源待接入`, customClass: 'klh-popper' });
     }
   }
 };

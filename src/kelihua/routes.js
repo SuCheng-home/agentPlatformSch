@@ -4,7 +4,9 @@ import state, { actions, getters } from './store';
 
 const Login = () => import('./views/Login.vue');
 const Layout = () => import('./views/Layout.vue');
+const Home = () => import('./views/Home.vue');
 const SubjectMatrix = () => import('./views/SubjectMatrix.vue');
+const LessonDetail = () => import('./views/LessonDetail.vue');
 const EducationMatrix = () => import('./views/EducationMatrix.vue');
 const CaseMatrix = () => import('./views/CaseMatrix.vue');
 const PromptLibrary = () => import('./views/PromptLibrary.vue');
@@ -51,10 +53,12 @@ export default [
   {
     path: '/kelihua',
     component: Layout,
-    redirect: '/kelihua/subject',
+    redirect: '/kelihua/home',
     meta: { requireAuth: false, hidden: true },
     children: [
+      page('home', Home, '首页'),
       page('subject', SubjectMatrix, '学科 AI 矩阵'),
+      page('lesson/:id', LessonDetail, '课时详情'),
       page('education', EducationMatrix, '育人管理矩阵'),
       page('course', CaseMatrix, '学程案例矩阵'),
       page('prompts', PromptLibrary, '提示词库'),

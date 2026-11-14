@@ -19,23 +19,36 @@
       <section class="hero" aria-labelledby="klh-platform-name">
         <div class="hero__mark">
           <brush-ke class="hero__ke" :delay="0.35" @replay="replayKey += 1" />
-          <p :key="`motto-${replayKey}`" class="hero__motto klh-brush" aria-label="以利华">
-            <span v-for="(ch, i) in '以利华'" :key="ch" :style="{ animationDelay: `${3.75 + i * 0.16}s` }">{{ ch }}</span>
-          </p>
+          <div :key="`motto-${replayKey}`" class="hero__motto-wrap">
+            <p class="hero__motto klh-brush" aria-label="以利华">
+              <span v-for="(ch, i) in '以利华'" :key="ch" :style="{ animationDelay: `${3.75 + i * 0.16}s` }">{{ ch }}</span>
+            </p>
+            <svg class="hero__swoosh" viewBox="0 0 600 64" preserveAspectRatio="none" aria-hidden="true">
+              <defs>
+                <linearGradient id="klh-login-swoosh" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0" stop-color="#f6a03c" stop-opacity="0.35" />
+                  <stop offset="0.3" stop-color="#ee8320" />
+                  <stop offset="1" stop-color="#e2700f" stop-opacity="0.9" />
+                </linearGradient>
+                <mask id="klh-login-swoosh-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="600" height="64">
+                  <path class="hero__swoosh-reveal" d="M0 48 C 200 34 400 22 600 10" pathLength="1" />
+                </mask>
+              </defs>
+              <path
+                mask="url(#klh-login-swoosh-mask)"
+                fill="url(#klh-login-swoosh)"
+                d="M6 50 C 120 38 260 28 420 18 C 500 13 560 9 596 6 C 560 13 500 20 420 28 C 280 40 140 50 14 60 C 6 60 2 54 6 50 Z"
+              />
+            </svg>
+          </div>
         </div>
 
         <div :key="`name-${replayKey}`" class="hero__name">
           <h1 id="klh-platform-name">
             <span class="klh-brush hero__zh">科智汇</span>
-            <span class="hero__dot" aria-hidden="true">·</span>
+            <span class="hero__bar" aria-hidden="true">｜</span>
             <span class="hero__ai">AI 矩阵平台</span>
           </h1>
-          <p class="hero__desc">科利华中学校本 AI 应用入口 —— 汇聚教学、育人与管理中的智能体、工具与提示词</p>
-          <ul class="hero__types" aria-label="平台资源类型">
-            <li><i class="dot dot--blue" />智能体</li>
-            <li><i class="dot dot--orange" />工具</li>
-            <li><i class="dot dot--ink" />提示词</li>
-          </ul>
         </div>
       </section>
 
@@ -122,7 +135,7 @@ export default {
     },
     goHome() {
       const redirect = this.$route.query.redirect;
-      this.$router.replace(typeof redirect === 'string' && redirect.startsWith('/kelihua') ? redirect : '/kelihua/subject');
+      this.$router.replace(typeof redirect === 'string' && redirect.startsWith('/kelihua') ? redirect : '/kelihua/home');
     }
   }
 };
@@ -230,13 +243,41 @@ export default {
 .hero__ke {
   width: clamp(200px, 26vw, 380px);
   height: clamp(200px, 26vw, 380px);
-  filter: drop-shadow(0 10px 24px rgba(20, 50, 154, 0.18));
+  filter: drop-shadow(0 10px 22px rgba(220, 106, 14, 0.2));
+}
+
+.hero__motto-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: clamp(16px, 3vw, 44px);
+}
+
+.hero__swoosh {
+  display: block;
+  width: 112%;
+  height: clamp(20px, 2.6vw, 40px);
+  margin: -0.12em 0 0 -4%;
+  overflow: visible;
+}
+
+.hero__swoosh-reveal {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 80;
+  stroke-linecap: butt;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: klh-swoosh 0.7s 4.35s cubic-bezier(0.5, 0, 0.3, 1) forwards;
+}
+
+@keyframes klh-swoosh {
+  to { stroke-dashoffset: 0; }
 }
 
 .hero__motto {
   display: flex;
   gap: 0.06em;
-  margin-bottom: clamp(16px, 3vw, 44px);
   font-size: clamp(56px, 7.4vw, 112px);
   line-height: 1;
   color: var(--klh-blue-deep);
@@ -253,7 +294,7 @@ export default {
 .hero__name {
   padding-left: clamp(4px, 1vw, 16px);
   opacity: 0;
-  animation: klh-fade-up 0.8s 4.4s ease-out forwards;
+  animation: klh-fade-up 0.8s 4.9s ease-out forwards;
 
   h1 {
     display: flex;
@@ -271,42 +312,14 @@ export default {
   color: var(--klh-blue);
   letter-spacing: 0.04em;
 }
-.hero__dot {
-  font-size: clamp(28px, 3vw, 44px);
+.hero__bar {
+  font-size: clamp(30px, 3.4vw, 50px);
+  font-weight: 300;
   color: var(--klh-orange);
 }
 .hero__ai {
   font-size: clamp(32px, 3.6vw, 54px);
   letter-spacing: 0.12em;
-}
-
-.hero__desc {
-  margin-top: 14px;
-  max-width: 560px;
-  font-size: 16px;
-  color: var(--klh-muted);
-  line-height: 1.6;
-  text-wrap: pretty;
-}
-
-.hero__types {
-  display: flex;
-  gap: 20px;
-  margin-top: 18px;
-  list-style: none;
-  font-size: 14px;
-  color: var(--klh-ink);
-
-  li { display: inline-flex; align-items: center; gap: 8px; }
-}
-
-.dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 3px;
-  &--blue { background: var(--klh-blue); }
-  &--orange { background: var(--klh-orange); }
-  &--ink { background: var(--klh-ink); }
 }
 
 /* 登录卡片 */
@@ -486,8 +499,6 @@ export default {
   }
   .hero { align-items: center; text-align: center; }
   .hero__name { padding-left: 0; h1 { justify-content: center; } }
-  .hero__types { justify-content: center; }
-  .hero__desc { margin-left: auto; margin-right: auto; }
   .login-card { width: 100%; max-width: 420px; margin: 0 auto; }
 }
 

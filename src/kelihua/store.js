@@ -6,6 +6,7 @@ import { LOCAL_PREVIEW_ENABLED, MOCK_DATA_ENABLED } from '@/config/local-preview
 import { SUBJECTS, DOMAINS, SCENES, PROMPT_CATEGORIES, GRADES } from './data/taxonomy';
 import { buildSeedResources, buildSeedSubmissions } from './data/resources';
 import { UNITS } from './data/units';
+import { LESSON_UNITS } from './data/lessons';
 
 export const DEMO_MODE = LOCAL_PREVIEW_ENABLED || MOCK_DATA_ENABLED;
 
@@ -30,6 +31,7 @@ const state = Vue.observable({
   resources: buildSeedResources(),
   submissions: buildSeedSubmissions(),
   units: UNITS,
+  lessonUnits: LESSON_UNITS,
   subjects: SUBJECTS.map((s) => ({ ...s })),
   domains: DOMAINS.map((d) => ({ ...d })),
   scenes: SCENES,
@@ -90,6 +92,32 @@ export const getters = {
   subjectLabel: (key) => (state.subjects.find((s) => s.key === key) || {}).label || '',
   domainLabel: (key) => (state.domains.find((d) => d.key === key) || {}).label || '',
   sceneLabel: (key) => (state.scenes.find((s) => s.key === key) || {}).label || '',
+  /**
+   * 课时详情：同时支持学科矩阵课例（ls*）与学程案例课时（u*-l*），统一为课时页所需结构
+   */
+  findLesson(id) {
+    for (const u of state.lessonUnits) {
+      const lesson = u.lessons.find((l) => l.id === id);
+      if (lesson) return { lesson, unit: u, siblings: u.lessons, source: 'subject' };
+    }
+    const m = /^(u\d+)-l(\d+)$/.exec(id || '');
+    const unit = m && state.units.find((u) => u.id === m[1]);
+    const raw = unit && unit.lessons[Number(m[2])];
+    if (!raw) return null;
+    const toLesson = (l, i) => ({
+      ...l,
+      id: `${unit.id}-l${i}`,
+      teacher: unit.designer.split(' · ')[0],
+      school: '南京市科利华中学',
+      cover: ['sx', 'wl', 'hx', 'sw'].includes(unit.subject) ? 'science' : 'book',
+      views: 3200 + i * 860,
+      likes: 420 + i * 133,
+      rating: 4.8,
+      ratingCount: 260 + i * 41
+    });
+    const siblings = unit.lessons.map(toLesson);
+    return { lesson: siblings[Number(m[2])], unit, siblings, source: 'course' };
+  },
   /** 提示词库：独立提示词 + 智能体自带的提示词说明 */
   allPrompts() {
     return state.resources

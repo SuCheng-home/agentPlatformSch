@@ -96,6 +96,10 @@ export default {
       ]
     };
   },
+  created() {
+    const { domain } = this.$route.query;
+    if (domain && state.domains.some((d) => d.key === domain)) this.domain = domain;
+  },
   computed: {
     all() {
       return getters.published((r) => r.matrix === 'education'
