@@ -12,7 +12,7 @@
       <article v-for="m in matrices" :key="m.key" :class="['mx', `mx--${m.key}`]">
         <router-link :to="m.to" class="mx__head" :aria-label="`进入${m.title}`">
           <span class="mx__icon" aria-hidden="true">
-            <klh-icon :name="m.icon" :size="34" :stroke="2" />
+            <img :src="art(m.icon)" alt="" width="128" height="128" />
           </span>
           <span class="mx__arrow" aria-hidden="true">
             <klh-icon name="arrowRight" :size="18" :stroke="2.2" />
@@ -23,7 +23,7 @@
         <ul class="mx__quick">
           <li v-for="q in m.quick" :key="q.label">
             <router-link :to="q.to" class="quick">
-              <span class="quick__icon" aria-hidden="true"><klh-icon :name="q.icon" :size="20" :stroke="2" /></span>
+              <span class="quick__icon" aria-hidden="true"><img :src="art(q.icon)" alt="" width="96" height="96" loading="lazy" /></span>
               <span class="quick__label">{{ q.label }}</span>
             </router-link>
           </li>
@@ -62,6 +62,8 @@ import coverBook from '../assets/cover-book.png';
 import coverScience from '../assets/cover-science.png';
 import state, { getters } from '../store';
 
+const ICON_ART = import.meta.glob('../assets/icons/*.webp', { eager: true, import: 'default' });
+
 export default {
   name: 'KlhHome',
   components: { KlhIcon },
@@ -73,39 +75,39 @@ export default {
           key: 'subject',
           title: '学科 AI 矩阵',
           sub: '精准教学 · 智慧教研',
-          icon: 'book',
+          icon: 'mx-subject',
           to: '/kelihua/subject',
           quick: [
-            { label: '智能备课', icon: 'graduation', to: '/kelihua/subject?cat=ai' },
-            { label: '精品课例', icon: 'award', to: '/kelihua/subject?featured=1' },
-            { label: '学科资源', icon: 'layers', to: '/kelihua/subject' },
-            { label: '提示词库', icon: 'prompt', to: '/kelihua/prompts' }
+            { label: '智能备课', icon: 'q-prepare', to: '/kelihua/subject?cat=ai' },
+            { label: '精品课例', icon: 'q-featured', to: '/kelihua/subject?featured=1' },
+            { label: '学科资源', icon: 'q-resource', to: '/kelihua/subject' },
+            { label: '提示词库', icon: 'q-prompt', to: '/kelihua/prompts' }
           ]
         },
         {
           key: 'education',
           title: '育人管理矩阵',
           sub: '五育融合 · 全面发展',
-          icon: 'users',
+          icon: 'mx-education',
           to: '/kelihua/education',
           quick: [
-            { label: '德育活动', icon: 'star', to: '/kelihua/education?domain=moral' },
-            { label: '心理关爱', icon: 'heart', to: '/kelihua/education?domain=mental' },
-            { label: '班主任工作', icon: 'trophy', to: '/kelihua/education?domain=headteacher' },
-            { label: '成长评价', icon: 'user', to: '/kelihua/education?domain=evaluate' }
+            { label: '德育活动', icon: 'q-moral', to: '/kelihua/education?domain=moral' },
+            { label: '心理关爱', icon: 'q-mental', to: '/kelihua/education?domain=mental' },
+            { label: '班主任工作', icon: 'q-headteacher', to: '/kelihua/education?domain=headteacher' },
+            { label: '成长评价', icon: 'q-evaluate', to: '/kelihua/education?domain=evaluate' }
           ]
         },
         {
           key: 'course',
           title: 'AI 赋能学程案例矩阵',
           sub: '创新实践 · 共建共享',
-          icon: 'bulb',
+          icon: 'mx-course',
           to: '/kelihua/course',
           quick: [
-            { label: '优秀案例', icon: 'file', to: '/kelihua/course' },
-            { label: '示范课堂', icon: 'video', to: '/kelihua/lesson/u1-l2' },
-            { label: '共建中心', icon: 'upload', to: '/kelihua/build' },
-            { label: '经验共享', icon: 'share', to: '/kelihua/prompts' }
+            { label: '优秀案例', icon: 'q-case', to: '/kelihua/course' },
+            { label: '示范课堂', icon: 'q-demo', to: '/kelihua/lesson/u1-l2' },
+            { label: '共建中心', icon: 'q-build', to: '/kelihua/build' },
+            { label: '经验共享', icon: 'q-share', to: '/kelihua/prompts' }
           ]
         }
       ]
@@ -139,7 +141,10 @@ export default {
     }
   },
   methods: {
-    subjectLabel: getters.subjectLabel
+    subjectLabel: getters.subjectLabel,
+    art(name) {
+      return ICON_ART[`../assets/icons/${name}.webp`];
+    }
   }
 };
 </script>
@@ -231,13 +236,21 @@ export default {
 .mx__icon {
   display: inline-grid;
   place-items: center;
-  width: 56px;
-  height: 56px;
-  border-radius: 16px;
+  width: 72px;
+  height: 72px;
+  border-radius: 20px;
   background: var(--klh-white);
-  color: var(--mx);
-  box-shadow: 0 6px 16px -10px var(--mx);
+  box-shadow: 0 8px 20px -12px var(--mx);
+
+  img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    transition: transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
 }
+
+.mx__head:hover .mx__icon img { transform: scale(1.08) rotate(-3deg); }
 
 .mx__arrow {
   position: absolute;
@@ -291,20 +304,27 @@ export default {
 
   &:hover {
     background: var(--klh-white);
-    .quick__icon { background: var(--mx); color: var(--klh-white); }
+    .quick__icon { box-shadow: 0 0 0 2px var(--mx), 0 6px 14px -6px var(--mx); }
+    .quick__icon img { transform: translateY(-2px) scale(1.06); }
   }
 }
 
 .quick__icon {
   display: grid;
   place-items: center;
-  width: 46px;
-  height: 46px;
+  width: 54px;
+  height: 54px;
   border-radius: 50%;
   background: var(--klh-white);
-  color: var(--mx);
   box-shadow: 0 2px 8px -4px rgba(23, 32, 58, 0.25);
-  transition: background 0.18s, color 0.18s;
+  transition: box-shadow 0.18s;
+
+  img {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+    transition: transform 0.2s;
+  }
 }
 
 .quick__label {

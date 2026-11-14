@@ -243,7 +243,7 @@ export default {
 .hero__ke {
   width: clamp(200px, 26vw, 380px);
   height: clamp(200px, 26vw, 380px);
-  filter: drop-shadow(0 10px 22px rgba(220, 106, 14, 0.2));
+  filter: drop-shadow(0 6px 10px rgba(220, 106, 14, 0.14));
 }
 
 .hero__motto-wrap {
@@ -277,6 +277,7 @@ export default {
 
 .hero__motto {
   display: flex;
+  align-items: baseline;
   gap: 0.06em;
   font-size: clamp(56px, 7.4vw, 112px);
   line-height: 1;
@@ -289,6 +290,10 @@ export default {
     filter: blur(4px);
     animation: klh-ink-in 0.7s ease-out forwards;
   }
+
+  /* 「以」为连接字，略小；「利华」为校名主体，突出显示 */
+  span:first-child { font-size: 0.8em; }
+  span:not(:first-child) { font-size: 1.08em; }
 }
 
 .hero__name {
