@@ -8,6 +8,7 @@ import DesktopApp from '@/views/desktop-app/index.vue';
 import AgentShare from '@/views/agent-share/index.vue';
 import Manual from '@/views/manual/index.vue';
 import { NAV_PAGES } from '@/config/nav';
+import kelihuaRoutes from '@/kelihua/routes';
 
 // 特定导航项对应的独立页面组件；未列出的导航项复用「智能体广场」视图
 const PAGE_COMPONENT_MAP = {
@@ -68,6 +69,8 @@ const routes = [
     component: AgentShare,
     meta: { title: '智能体预览', hidden: true, requireAuth: false }
   },
+  // 南京市科利华中学 · 科智汇｜AI矩阵平台（独立登录页与布局，入口 #/kelihua）
+  ...kelihuaRoutes,
   { path: '*', redirect: '/home' }
 ];
 

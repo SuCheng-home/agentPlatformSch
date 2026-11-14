@@ -61,7 +61,8 @@ export default defineConfig(({ mode, command }) => {
         ? { 'Content-Security-Policy': "connect-src 'self' ws: wss:; frame-src 'none'; img-src 'self' data: blob:" }
         : {},
       // 允许通过 127.0.0.1、localhost 等本地地址访问开发服务器
-      allowedHosts: ['localhost', '127.0.0.1']
+      // ai-8080.v0.build：v0 在线预览域名
+      allowedHosts: ['localhost', '127.0.0.1', 'ai-8080.v0.build']
     },
 
     build: {

@@ -1,0 +1,207 @@
+/* 科利华中学 · 科智汇主题：所有样式限定在 .klh 作用域内，不影响九中平台 */
+@font-face {
+  font-family: 'KlhBrush';
+  src: url('../assets/kelihua-brush.woff2') format('woff2');
+  font-display: block;
+}
+
+.klh {
+  /* 五色体系：校徽蓝（品牌/智能体）、暖橙（工具）、墨色（文字/提示词）、宣纸白、纯白 */
+  --klh-blue: #1c45c4;
+  --klh-blue-deep: #14329a;
+  --klh-orange: #ec7a16;
+  --klh-ink: #17203a;
+  --klh-paper: #faf7f2;
+  --klh-white: #ffffff;
+
+  --klh-blue-tint: rgba(28, 69, 196, 0.08);
+  --klh-blue-tint-2: rgba(28, 69, 196, 0.14);
+  --klh-orange-tint: rgba(236, 122, 22, 0.1);
+  --klh-orange-tint-2: rgba(236, 122, 22, 0.18);
+  --klh-ink-tint: rgba(23, 32, 58, 0.05);
+  --klh-muted: rgba(23, 32, 58, 0.62);
+  --klh-faint: rgba(23, 32, 58, 0.42);
+  --klh-line: rgba(23, 32, 58, 0.09);
+  --klh-line-strong: rgba(23, 32, 58, 0.16);
+  --klh-radius: 14px;
+  --klh-radius-sm: 9px;
+  --klh-shadow: 0 1px 2px rgba(23, 32, 58, 0.04), 0 8px 24px -12px rgba(23, 32, 58, 0.12);
+
+  min-height: 100%;
+  background: var(--klh-paper);
+  color: var(--klh-ink);
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Segoe UI', sans-serif;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+
+  .klh-brush {
+    font-family: 'KlhBrush', 'STKaiti', 'KaiTi', serif;
+    font-weight: normal;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--klh-blue);
+    outline-offset: 2px;
+  }
+
+  /* 通用按钮 */
+  .klh-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 36px;
+    padding: 0 16px;
+    border-radius: 999px;
+    border: 1px solid var(--klh-line-strong);
+    background: var(--klh-white);
+    color: var(--klh-ink);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.2s;
+    white-space: nowrap;
+
+    &:hover { border-color: var(--klh-blue); color: var(--klh-blue); }
+    &:active { transform: translateY(1px); }
+    &:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    &--primary {
+      background: var(--klh-blue);
+      border-color: var(--klh-blue);
+      color: var(--klh-white);
+      &:hover { background: var(--klh-blue-deep); border-color: var(--klh-blue-deep); color: var(--klh-white); }
+    }
+    &--orange {
+      background: var(--klh-orange);
+      border-color: var(--klh-orange);
+      color: var(--klh-white);
+      &:hover { filter: brightness(0.94); color: var(--klh-white); border-color: var(--klh-orange); }
+    }
+    &--ghost {
+      border-color: transparent;
+      background: transparent;
+      &:hover { background: var(--klh-ink-tint); border-color: transparent; color: var(--klh-ink); }
+    }
+    &--sm { height: 30px; padding: 0 12px; font-size: 13px; }
+  }
+
+  /* 筛选胶囊 */
+  .klh-chip {
+    height: 32px;
+    padding: 0 14px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--klh-muted);
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.18s;
+    white-space: nowrap;
+    &:hover { color: var(--klh-ink); background: var(--klh-ink-tint); }
+    &.is-active {
+      background: var(--klh-ink);
+      color: var(--klh-white);
+    }
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .klh-search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 300px;
+    max-width: 100%;
+    height: 40px;
+    padding: 0 14px;
+    border-radius: 999px;
+    border: 1px solid var(--klh-line-strong);
+    background: var(--klh-white);
+    color: var(--klh-faint);
+
+    &:focus-within { border-color: var(--klh-blue); }
+
+    input {
+      flex: 1;
+      min-width: 0;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      font: inherit;
+      font-size: 14px;
+      color: var(--klh-ink);
+    }
+  }
+
+  .klh-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+
+  .klh-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 48px 16px;
+    border-radius: var(--klh-radius);
+    border: 1px dashed var(--klh-line-strong);
+    color: var(--klh-muted);
+    font-size: 14px;
+    text-align: center;
+  }
+
+  .klh-panel {
+    border-radius: var(--klh-radius);
+    border: 1px solid var(--klh-line);
+    background: var(--klh-white);
+  }
+
+  .klh-page {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 28px 32px 64px;
+  }
+
+  @media (max-width: 768px) {
+    .klh-page { padding: 20px 16px 48px; }
+  }
+}
+
+/* Element UI 在科智汇作用域内的品牌化（弹层挂载在 body，需要额外的 popper-class） */
+.klh,
+.klh-popper {
+  .el-button--primary {
+    background: #1c45c4;
+    border-color: #1c45c4;
+    &:hover, &:focus { background: #14329a; border-color: #14329a; }
+  }
+  .el-input__inner:focus,
+  .el-textarea__inner:focus,
+  .el-select .el-input.is-focus .el-input__inner,
+  .el-select .el-input__inner:focus { border-color: #1c45c4; }
+  .el-radio-button__orig-radio:checked + .el-radio-button__inner {
+    background: #17203a;
+    border-color: #17203a;
+    box-shadow: -1px 0 0 0 #17203a;
+  }
+  .el-radio-button__inner:hover { color: #1c45c4; }
+  .el-checkbox__input.is-checked .el-checkbox__inner { background: #1c45c4; border-color: #1c45c4; }
+  .el-checkbox__input.is-checked + .el-checkbox__label { color: #1c45c4; }
+  .el-select-dropdown__item.selected { color: #1c45c4; }
+  .el-input__inner, .el-textarea__inner { border-radius: 9px; }
+}
+
+.klh-drawer {
+  .el-drawer__header { margin-bottom: 0; padding: 20px 24px 0; }
+  .el-drawer__body { overflow: auto; }
+}
