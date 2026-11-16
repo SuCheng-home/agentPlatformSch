@@ -27,7 +27,7 @@
 
     <el-form-item v-if="form.type !== 'prompt'" label="归属矩阵" prop="matrix">
       <el-radio-group v-model="form.matrix">
-        <el-radio-button label="subject">学科 AI 矩阵</el-radio-button>
+        <el-radio-button label="subject">学科应用矩阵</el-radio-button>
         <el-radio-button label="education">育人管理矩阵</el-radio-button>
       </el-radio-group>
     </el-form-item>

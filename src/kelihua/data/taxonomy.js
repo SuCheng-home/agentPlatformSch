@@ -8,7 +8,7 @@ export const RESOURCE_TYPES = {
 };
 
 export const MATRICES = {
-  subject: { label: '学科 AI 矩阵', code: 'XK' },
+  subject: { label: '学科应用矩阵', code: 'XK' },
   education: { label: '育人管理矩阵', code: 'YR' },
   course: { label: 'AI 赋能学程案例矩阵', code: 'XC' }
 };

@@ -74,7 +74,7 @@ export default {
     navItems() {
       const items = [
         { to: '/kelihua/home', label: '首页' },
-        { to: '/kelihua/subject', label: '学科 AI 矩阵' },
+        { to: '/kelihua/subject', label: '学科应用矩阵' },
         { to: '/kelihua/education', label: '育人管理矩阵' },
         { to: '/kelihua/course', label: '学程案例矩阵' },
         { to: '/kelihua/prompts', label: '提示词库' },

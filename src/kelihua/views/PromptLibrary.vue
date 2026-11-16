@@ -98,7 +98,7 @@ export default {
     },
     categories() {
       if (this.source === 'prompt') return ['全部', ...state.promptCategories];
-      if (this.source === 'agent') return ['全部', '学科 AI 矩阵', '育人管理矩阵'];
+      if (this.source === 'agent') return ['全部', '学科应用矩阵', '育人管理矩阵'];
       return [];
     },
     list() {
@@ -114,7 +114,7 @@ export default {
       return key === 'all' ? this.all.length : this.all.filter((p) => p.type === key).length;
     },
     matrixLabel(p) {
-      return p.matrix === 'subject' ? '学科 AI 矩阵' : '育人管理矩阵';
+      return p.matrix === 'subject' ? '学科应用矩阵' : '育人管理矩阵';
     },
     catOf(p) {
       if (p.type === 'prompt') return p.category;

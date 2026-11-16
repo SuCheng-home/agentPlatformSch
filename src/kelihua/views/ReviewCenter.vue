@@ -171,7 +171,7 @@ export default {
       return { published: '已发布', rejected: '已退回', first: '待初审', final: '待终审' }[this.stateKey(s)];
     },
     placeOf(s) {
-      if (s.matrix === 'subject') return `学科 AI 矩阵 · ${getters.subjectLabel(s.subject)} · ${getters.sceneLabel(s.scene)}`;
+      if (s.matrix === 'subject') return `学科应用矩阵 · ${getters.subjectLabel(s.subject)} · ${getters.sceneLabel(s.scene)}`;
       if (s.matrix === 'education') return `育人管理矩阵 · ${getters.domainLabel(s.domain)}`;
       return `提示词库 · ${s.category}`;
     },

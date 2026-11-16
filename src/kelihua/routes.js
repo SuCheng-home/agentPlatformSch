@@ -57,7 +57,7 @@ export default [
     meta: { requireAuth: false, hidden: true },
     children: [
       page('home', Home, '首页'),
-      page('subject', SubjectMatrix, '学科 AI 矩阵'),
+      page('subject', SubjectMatrix, '学科应用矩阵'),
       page('lesson/:id', LessonDetail, '课时详情'),
       page('education', EducationMatrix, '育人管理矩阵'),
       page('course', CaseMatrix, '学程案例矩阵'),

@@ -24,7 +24,7 @@
     <section v-if="tab === 'order'" class="klh-panel cm-order">
       <div class="cm-toolbar">
         <el-radio-group v-model="matrix" size="small" @change="onMatrix">
-          <el-radio-button label="subject">学科 AI 矩阵</el-radio-button>
+          <el-radio-button label="subject">学科应用矩阵</el-radio-button>
           <el-radio-button label="education">育人管理矩阵</el-radio-button>
           <el-radio-button label="prompt">提示词库</el-radio-button>
         </el-radio-group>
