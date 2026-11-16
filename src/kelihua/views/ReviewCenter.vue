@@ -111,7 +111,7 @@
 <script>
 import PageHead from '../components/PageHead.vue';
 import ApprovalSteps from '../components/ApprovalSteps.vue';
-import PromptBlock from '../components/PromptBlock.vue';
+import PromptBlock from '../components/prompt-block.vue';
 import TypeBadge from '../components/TypeBadge.vue';
 import KlhIcon from '../components/KlhIcon.vue';
 import state, { actions, getters } from '../store';

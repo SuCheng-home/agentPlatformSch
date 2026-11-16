@@ -76,7 +76,7 @@
 
 <script>
 import PageHead from '../components/PageHead.vue';
-import ResourceCard from '../components/ResourceCard.vue';
+import ResourceCard from '../components/resource-card.vue';
 import KlhIcon from '../components/KlhIcon.vue';
 import state, { getters } from '../store';
 

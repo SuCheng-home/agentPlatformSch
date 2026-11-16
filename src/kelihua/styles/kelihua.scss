@@ -208,3 +208,8 @@
   .el-drawer__header { margin-bottom: 0; padding: 20px 24px 0; }
   .el-drawer__body { overflow: auto; }
 }
+
+// 操作反馈不拦截顶部导航的点击。
+.el-message.klh-popper {
+  pointer-events: none;
+}

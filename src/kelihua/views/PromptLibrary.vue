@@ -4,7 +4,7 @@
       glyph="词"
       eyebrow="提示词库"
       title="看得见、拿得走的提示词"
-      desc="汇集老师们沉淀的独立提示词，以及每个智能体背后的系统提示词说明。可以直接复制使用，也可以借鉴改写成自己的版本。"
+      desc="汇集老师们沉淀的独立提示词，以及智能体的人设、回复设定与工具提示词。可以直接复制使用，也可以借鉴改写成自己的版本。"
     >
       <label class="klh-search">
         <klh-icon name="search" :size="16" />
@@ -63,14 +63,14 @@
     </div>
     <div v-else class="klh-empty">
       <klh-icon name="prompt" :size="28" />
-      <p>没有找到匹配的提示词。</p>
+      <p>暂无可复制内容。学校资料未附完整人设、回复设定或提示词，待作者补充。</p>
     </div>
   </div>
 </template>
 
 <script>
 import PageHead from '../components/PageHead.vue';
-import PromptBlock from '../components/PromptBlock.vue';
+import PromptBlock from '../components/prompt-block.vue';
 import TypeBadge from '../components/TypeBadge.vue';
 import KlhIcon from '../components/KlhIcon.vue';
 import state, { actions, getters } from '../store';
@@ -87,7 +87,8 @@ export default {
       sources: [
         { key: 'all', label: '全部提示词' },
         { key: 'prompt', label: '独立提示词', type: 'prompt' },
-        { key: 'agent', label: '智能体提示词', type: 'agent' }
+        { key: 'agent', label: '智能体人设与回复', type: 'agent' },
+        { key: 'tool', label: '工具提示词', type: 'tool' }
       ]
     };
   },

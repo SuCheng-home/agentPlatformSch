@@ -2,17 +2,17 @@
 import './styles/kelihua.scss';
 import state, { actions, getters } from './store';
 
-const Login = () => import('./views/Login.vue');
+const Login = () => import('./views/login.vue');
 const Layout = () => import('./views/Layout.vue');
-const Home = () => import('./views/Home.vue');
-const SubjectMatrix = () => import('./views/SubjectMatrix.vue');
-const LessonDetail = () => import('./views/LessonDetail.vue');
+const Home = () => import('./views/home.vue');
+const SubjectMatrix = () => import('./views/subject-matrix.vue');
+const LessonDetail = () => import('./views/lesson-detail.vue');
 const EducationMatrix = () => import('./views/EducationMatrix.vue');
-const CaseMatrix = () => import('./views/CaseMatrix.vue');
+const CaseMatrix = () => import('./views/case-matrix.vue');
 const PromptLibrary = () => import('./views/PromptLibrary.vue');
 const BuildCenter = () => import('./views/BuildCenter.vue');
 const ReviewCenter = () => import('./views/ReviewCenter.vue');
-const CatalogManage = () => import('./views/CatalogManage.vue');
+const CatalogManage = () => import('./views/catalog-manage.vue');
 
 const TITLE = '科智汇｜AI矩阵平台';
 

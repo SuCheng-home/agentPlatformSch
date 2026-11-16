@@ -26,7 +26,9 @@ export const SUBJECTS = [
   { key: 'ls', label: '历史', code: 'LS' },
   { key: 'dl', label: '地理', code: 'DL' },
   { key: 'xx', label: '信息科技', code: 'XX' },
-  { key: 'yt', label: '艺术与体育', code: 'YT' }
+  { key: 'ms', label: '美术', code: 'MS' },
+  { key: 'ty', label: '体育', code: 'TY' },
+  { key: 'xl', label: '心理健康', code: 'XL' }
 ];
 
 export const SCENES = [

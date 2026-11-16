@@ -1,0 +1,1959 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>特殊法测密度 - 虚拟实验平台</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent; /* 移除移动端点击高亮 */
+            -webkit-touch-callout: none; /* 禁止长按弹出菜单 */
+        }
+        
+        body {
+            background-color: #f0f7ff;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            overflow-x: hidden;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #1a6dcc, #0d4d9c);
+            color: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 60, 120, 0.2);
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        .section {
+            background-color: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            color: #0d4d9c;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e6f0ff;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title i {
+            margin-right: 10px;
+            font-size: 1.3rem;
+        }
+        
+        /* 实验器材区域 */
+        .equipment-area {
+            min-height: 200px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+            justify-content: center;
+            padding: 20px;
+            background-color: #f8fbff;
+            border-radius: 8px;
+            border: 2px dashed #c2d9ff;
+            -webkit-user-select: none; /* 禁止文本选择 */
+            user-select: none;
+        }
+        
+        .equipment-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 150px;
+            cursor: pointer; /* 改为pointer，增强触摸反馈 */
+            transition: transform 0.2s;
+            touch-action: manipulation; /* 优化触摸操作 */
+        }
+        
+        .equipment-item:hover, .equipment-item:active {
+            transform: translateY(-5px);
+        }
+        
+        .equipment-img {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+            margin-bottom: 10px;
+            background-color: white;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+            border: 2px solid #e0edff;
+            -webkit-user-drag: none; /* 禁止默认拖拽 */
+            user-drag: none;
+        }
+        
+        .equipment-name {
+            font-size: 0.95rem;
+            color: #333;
+            text-align: center;
+            font-weight: 500;
+            background-color: #e6f0ff;
+            padding: 5px 10px;
+            border-radius: 20px;
+            width: 100%;
+        }
+        
+        /* 实验操作区域 */
+        .operation-area {
+            min-height: 300px;
+            padding: 25px;
+            background-color: #f8fbff;
+            border-radius: 8px;
+            border: 2px solid #c2d9ff;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+            align-items: flex-start;
+            justify-content: center;
+            position: relative;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        
+        .operation-area::before {
+            content: "将器材拖放到此区域进行实验操作";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #a0c1eb;
+            font-size: 1.2rem;
+            opacity: 0.6;
+            display: none;
+        }
+        
+        .operation-area.empty::before {
+            display: block;
+        }
+        
+        .operation-item {
+            position: relative;
+            width: 160px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .operation-img-container {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            margin-bottom: 10px;
+        }
+        
+        .operation-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background-color: white;
+            border-radius: 8px;
+            padding: 12px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+            border: 2px solid #a0c1eb;
+            cursor: move;
+            -webkit-user-drag: none;
+            user-drag: none;
+            touch-action: manipulation;
+        }
+        
+        /* 移动端拖拽指示器 */
+        .drag-indicator {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 24px;
+            height: 24px;
+            background-color: rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #666;
+            display: none; /* 默认隐藏，在移动端显示 */
+        }
+        
+        .delete-btn {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 24px;
+            height: 24px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            z-index: 10;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            touch-action: manipulation;
+        }
+        
+        .delete-btn:hover, .delete-btn:active {
+            background-color: #d32f2f;
+            transform: scale(1.1);
+        }
+        
+        .position-controls {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 5px;
+        }
+        
+        .arrow-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            touch-action: manipulation;
+        }
+        
+        .arrow-btn:hover, .arrow-btn:active {
+            background-color: #3d8b40;
+            transform: scale(1.1);
+        }
+        
+        .arrow-btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .left-arrow {
+            margin-right: auto;
+        }
+        
+        .right-arrow {
+            margin-left: auto;
+        }
+        
+        .operation-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+            margin-top: 5px;
+        }
+        
+        .btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+            touch-action: manipulation;
+        }
+        
+        .btn-measure {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .btn-measure:hover, .btn-measure:active {
+            background-color: #3d8b40;
+        }
+        
+        .btn-mark {
+            background-color: #FF9800;
+            color: white;
+        }
+        
+        .btn-mark:hover, .btn-mark:active {
+            background-color: #e68900;
+        }
+        
+        .btn-add-water {
+            background-color: #2196F3;
+            color: white;
+        }
+        
+        .btn-add-water:hover, .btn-add-water:active {
+            background-color: #0b7dda;
+        }
+        
+        .mass-label {
+            margin-top: 8px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #d32f2f;
+            min-height: 28px;
+            text-align: center;
+        }
+        
+        /* 实验结果区域 - 修改为一行两格，左侧对齐 */
+        .result-area {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding: 25px;
+            background-color: #f0f9ff;
+            border-radius: 8px;
+            border: 2px dashed #0d4d9c;
+            min-height: 250px; /* 增加高度以扩大绘图区域 */
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .result-display {
+            display: flex;
+            gap: 20px;
+            flex: 0 0 auto;
+        }
+        
+        .result-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .result-line {
+            font-size: 1.8rem;
+            color: #0d4d9c;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        
+        .result-line span {
+            background-color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+            min-width: 100%;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            text-align: left;
+        }
+        
+        /* 绘图区域 - 扩大绘图区域 */
+        .drawing-area {
+            flex: 1;
+            position: relative;
+            min-height: 150px; /* 增加最小高度 */
+            background-color: rgba(240, 249, 255, 0.7);
+            border-radius: 8px;
+            border: 1px solid #c2d9ff;
+            margin-top: 10px;
+        }
+        
+        .drawing-canvas-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+        }
+        
+        .drawing-canvas {
+            width: 100%;
+            height: 100%;
+            background-color: transparent;
+            cursor: crosshair;
+            touch-action: none; /* 禁用所有默认触摸行为，完全控制 */
+        }
+        
+        .drawing-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 10;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .drawing-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .drawing-btn:hover, .drawing-btn:active {
+            transform: scale(1.1);
+        }
+        
+        .btn-draw {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .btn-erase {
+            background-color: #FF9800;
+            color: white;
+        }
+        
+        .btn-clear {
+            background-color: #f44336;
+            color: white;
+        }
+        
+        .color-picker {
+            display: flex;
+            gap: 6px;
+            margin-top: 5px;
+        }
+        
+        .color-option {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid #ddd;
+            cursor: pointer;
+        }
+        
+        .color-option.active {
+            border-color: #333;
+            transform: scale(1.2);
+        }
+        
+        .line-width-control {
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .line-width-control input {
+            flex: 1;
+        }
+        
+        /* 绘图提示 */
+        .drawing-hint {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #0d4d9c;
+            font-size: 1.2rem;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 15px 20px;
+            border-radius: 10px;
+            text-align: center;
+            z-index: 5;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border: 2px solid #0d4d9c;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            width: 80%;
+            max-width: 400px;
+        }
+        
+        .drawing-hint.hidden {
+            display: none;
+        }
+        
+        .drawing-hint-icon {
+            font-size: 2rem;
+        }
+        
+        /* 提示信息 */
+        .instructions {
+            background-color: #e8f4ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 0.95rem;
+            border-left: 4px solid #0d4d9c;
+        }
+        
+        .instructions h3 {
+            color: #0d4d9c;
+            margin-bottom: 8px;
+        }
+        
+        .instructions ul {
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 5px;
+        }
+        
+        /* 移动端提示 */
+        .mobile-tip {
+            display: none;
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            border-left: 4px solid #ffc107;
+        }
+        
+        /* 重置按钮 */
+        .reset-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 12px 30px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            touch-action: manipulation;
+        }
+        
+        .reset-btn:hover, .reset-btn:active {
+            background-color: #d32f2f;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            color: #666;
+            font-size: 0.9rem;
+            border-top: 1px solid #ddd;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .equipment-area, .operation-area {
+                gap: 15px;
+            }
+            
+            .equipment-item, .operation-item {
+                width: 130px;
+            }
+            
+            .equipment-img {
+                width: 85px;
+                height: 85px;
+            }
+            
+            .operation-img-container {
+                width: 110px;
+                height: 110px;
+            }
+            
+            .result-display {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .result-line span {
+                height: 55px;
+            }
+            
+            .result-line {
+                font-size: 1.6rem;
+            }
+            
+            .result-area {
+                min-height: 300px; /* 移动端也增加高度 */
+            }
+            
+            .drawing-area {
+                min-height: 180px; /* 移动端增加更多绘图区域 */
+            }
+            
+            .mobile-tip {
+                display: block;
+            }
+            
+            .drag-indicator {
+                display: flex;
+            }
+            
+            /* 调整按钮大小，便于触摸操作 */
+            .btn, .arrow-btn, .delete-btn {
+                padding: 10px 14px;
+                font-size: 1rem;
+                min-width: 44px;
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .arrow-btn, .delete-btn {
+                width: 36px;
+                height: 36px;
+                font-size: 18px;
+            }
+            
+            /* 防止按钮被长按选中 */
+            button {
+                -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                user-select: none;
+            }
+            
+            /* 提高按钮的触摸响应区域 */
+            .operation-buttons .btn {
+                position: relative;
+                z-index: 100;
+            }
+            
+            /* 为操作区域中的按钮添加触摸反馈 */
+            .btn:active, .arrow-btn:active, .delete-btn:active {
+                transform: scale(0.95);
+                transition: transform 0.1s;
+            }
+            
+            /* 绘图控件调整 */
+            .drawing-controls {
+                top: 5px;
+                right: 5px;
+                padding: 8px;
+            }
+            
+            .drawing-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+            
+            .drawing-hint {
+                font-size: 1rem;
+                padding: 12px 16px;
+            }
+        }
+        
+        /* 防止iOS缩放 */
+        @supports (-webkit-touch-callout: none) {
+            body {
+                /* 防止iOS Safari缩放 */
+                touch-action: pan-y pinch-zoom;
+            }
+            
+            .drawing-canvas {
+                /* 在iOS上禁用双指缩放 */
+                touch-action: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>特殊法测密度虚拟实验平台</h1>
+        <p class="subtitle">南京市科利华中学物理组</p>
+    </header>
+    
+    <div class="container">
+        <section class="section">
+            <h2 class="section-title">
+                <i>🧪</i> 实验器材
+            </h2>
+            <p class="instructions">请将下方实验器材拖拽到"实验操作区域"进行实验。每个器材可以多次使用。</p>
+            <div class="mobile-tip">
+                <strong>iPad/iPhone用户提示：</strong> 长按器材图标，然后拖动到实验操作区域释放。
+            </div>
+            <div class="equipment-area" id="equipmentArea">
+                <!-- 器材将通过JavaScript动态生成 -->
+            </div>
+        </section>
+        
+        <section class="section">
+            <h2 class="section-title">
+                <i>🔬</i> 实验操作区域
+            </h2>
+            <p class="instructions">在此区域摆放器材、测量质量并进行实验操作。可以拖动器材调整位置，点击"测质量"按钮记录数据。</p>
+            <div class="mobile-tip">
+                <strong>iPad/iPhone用户提示：</strong> 可以长按操作区域中的器材进行拖动调整位置。
+            </div>
+            <div class="operation-area empty" id="operationArea">
+                <!-- 操作区域的器材将通过拖拽动态生成 -->
+            </div>
+        </section>
+        
+        <section class="section">
+            <h2 class="section-title">
+                <i>📊</i> 实验结果
+            </h2>
+            <p class="instructions">根据实验测量的质量数据，计算元宝的体积和密度，并将结果填写在下方的空白处。您可以在下方绘图区域直接绘图记录计算过程和结果。</p>
+            <div class="result-area">
+                <!-- 结果显示区域 -->
+                <div class="result-display">
+                    <div class="result-column">
+                        <div class="result-line">
+                            <span id="volumeResult">V<sub>元宝</sub> = </span>
+                        </div>
+                    </div>
+                    <div class="result-column">
+                        <div class="result-line">
+                            <span id="densityResult">ρ<sub>元宝</sub> = </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 绘图区域 - 扩大区域 -->
+                <div class="drawing-area">
+                    <!-- 绘图画布容器 -->
+                    <div class="drawing-canvas-container">
+                        <canvas class="drawing-canvas" id="drawingCanvas"></canvas>
+                    </div>
+                    
+                    <!-- 绘图控件 -->
+                    <div class="drawing-controls">
+                        <button class="drawing-btn btn-draw" id="drawBtn" title="绘图模式">✏️</button>
+                        <button class="drawing-btn btn-erase" id="eraseBtn" title="橡皮擦">🧽</button>
+                        <button class="drawing-btn btn-clear" id="clearBtn" title="清除所有绘图">🗑️</button>
+                        
+                        <div class="color-picker">
+                            <div class="color-option active" style="background-color: #000000;" data-color="#000000"></div>
+                            <div class="color-option" style="background-color: #f44336;" data-color="#f44336"></div>
+                            <div class="color-option" style="background-color: #4CAF50;" data-color="#4CAF50"></div>
+                            <div class="color-option" style="background-color: #2196F3;" data-color="#2196F3"></div>
+                            <div class="color-option" style="background-color: #9C27B0;" data-color="#9C27B0"></div>
+                        </div>
+                        
+                        <div class="line-width-control">
+                            <span>粗细:</span>
+                            <input type="range" id="lineWidth" min="1" max="20" value="3">
+                        </div>
+                    </div>
+                    
+                    <!-- 绘图提示 -->
+                    <div class="drawing-hint" id="drawingHint">
+                        <div class="drawing-hint-icon">🖐️</div>
+                        <div>用力按压屏幕即可开始绘图</div>
+                        <div><small>在iPad上可以使用手指或Apple Pencil</small></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <button class="reset-btn" id="resetBtn">重置实验</button>
+        
+        <div class="instructions">
+            <h3>实验步骤提示：</h3>
+            <ul>
+                <li>1. 将元宝拖入实验操作区域，测量质量 m₀</li>
+                <li>2. 将装水的烧杯拖入实验操作区域，测量质量 m₁</li>
+                <li>3. 将元宝放入装水的烧杯中，测量质量 m₂，然后点击"做标记"按钮</li>
+                <li>4. 取出元宝，测量剩余水和烧杯的质量 m₃</li>
+                <li>5. 点击"加水"按钮使水面回到标记处，测量质量 m₅</li>
+                <li>6. 根据测量结果，在实验结果区域计算并填写体积和密度</li>
+                <li>提示：V元宝 = (m₅ - m₃) / ρ水 (ρ水 = 1.0 g/cm³) | ρ元宝 = m₀ / V元宝</li>
+                <li><strong>绘图功能：</strong>在下方绘图区域，可以使用手指或Apple Pencil绘图记录实验过程和计算结果</li>
+            </ul>
+        </div>
+    </div>
+    
+    <footer>
+        <p>初中物理虚拟实验平台 | 特殊法测密度实验 | 设计用于教学演示</p>
+    </footer>
+
+    <script>
+        // 器材数据 - 删除空烧杯，重新编号质量符号
+        const equipmentData = [
+            { id: 1, name: "元宝", img: "gold.png", type: "gold", massSymbol: "m₀" },
+            { id: 2, name: "装水的烧杯", img: "water_cup.png", type: "waterCup", massSymbol: "m₁" },
+            { id: 3, name: "装元宝和水的烧杯", img: "gold_water_cup.png", type: "goldWaterCup", massSymbol: "m₂" },
+            { id: 4, name: "取走元宝的有水烧杯", img: "water_cup_without_gold.png", type: "waterCupWithoutGold", massSymbol: "m₃" },
+            { id: 5, name: "沾水的元宝", img: "wet_gold.png", type: "wetGold", massSymbol: "m₄" }
+        ];
+        
+        // 标记后的器材
+        const markedEquipment = {
+            id: 6, 
+            name: "做标记的烧杯(元宝+水)", 
+            img: "marked_gold_water_cup.png", 
+            type: "markedGoldWaterCup", 
+            massSymbol: "m₂"
+        };
+        
+        // 加水后的器材
+        const addedWaterEquipment = {
+            id: 7, 
+            name: "加水至标记的烧杯", 
+            img: "added_water_cup.png", 
+            type: "addedWaterCup", 
+            massSymbol: "m₅"
+        };
+        
+        // 存储实验数据 - 重新编号
+        let experimentData = {
+            m0: false,  // 元宝质量是否已测量
+            m1: false,  // 装水的烧杯质量是否已测量 (原m₂)
+            m2: false,  // 装元宝和水的烧杯质量是否已测量 (原m₃)
+            m3: false,  // 取走元宝的有水烧杯质量是否已测量 (原m₄)
+            m4: false,  // 沾水的元宝质量是否已测量 (原m₅)
+            m5: false   // 加水至标记的烧杯质量是否已测量 (原m₆)
+        };
+        
+        // 操作区域中的器材元素
+        let operationItems = [];
+        let nextItemId = 1;
+        
+        // 检测是否移动设备
+        const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        
+        // 绘图相关变量
+        let canvas, ctx;
+        let isDrawing = false;
+        let isErasing = false;
+        let lastX = 0;
+        let lastY = 0;
+        let lineWidth = 3;
+        let currentColor = "#000000";
+        
+        // 初始化器材区域
+        function initEquipmentArea() {
+            const equipmentArea = document.getElementById('equipmentArea');
+            
+            equipmentData.forEach(equipment => {
+                const item = document.createElement('div');
+                item.className = 'equipment-item';
+                item.dataset.type = equipment.type;
+                item.dataset.id = equipment.id;
+                
+                // 创建图片
+                const img = document.createElement('div');
+                img.className = 'equipment-img';
+                img.style.backgroundColor = getEquipmentColor(equipment.type);
+                img.innerHTML = createEquipmentSVG(equipment.type);
+                
+                // 添加移动端拖拽指示器
+                const dragIndicator = document.createElement('div');
+                dragIndicator.className = 'drag-indicator';
+                dragIndicator.innerHTML = '↕';
+                
+                // 创建名称
+                const name = document.createElement('div');
+                name.className = 'equipment-name';
+                name.textContent = equipment.name;
+                
+                item.appendChild(img);
+                item.appendChild(dragIndicator);
+                item.appendChild(name);
+                
+                // 添加事件监听 - 根据设备类型使用不同的事件
+                if (isMobileDevice) {
+                    // 移动设备：使用触摸事件
+                    item.addEventListener('touchstart', handleTouchStart, { passive: false });
+                    item.addEventListener('touchmove', handleTouchMove, { passive: false });
+                    item.addEventListener('touchend', handleTouchEnd);
+                } else {
+                    // 桌面设备：使用鼠标事件
+                    item.draggable = true;
+                    item.addEventListener('dragstart', handleDragStart);
+                }
+                
+                equipmentArea.appendChild(item);
+            });
+        }
+        
+        // 根据器材类型返回颜色
+        function getEquipmentColor(type) {
+            const colors = {
+                gold: '#fff9c4',
+                waterCup: '#e3f2fd',
+                goldWaterCup: '#e8eaf6',
+                waterCupWithoutGold: '#f3e5f5',
+                wetGold: '#fff3e0',
+                markedGoldWaterCup: '#e8f5e9',
+                addedWaterCup: '#e0f7fa'
+            };
+            return colors[type] || '#ffffff';
+        }
+        
+        // 创建器材的SVG图像
+        function createEquipmentSVG(type) {
+            // 根据您提供的元宝图案重新设计
+            const svgMap = {
+                // 元宝 - 根据您提供的元宝图案重新设计
+                gold: `<svg viewBox="0 0 100 100">
+                    <!-- 元宝主体 -->
+                    <path d="M30,40 Q50,20 70,40 Q80,50 75,65 Q70,80 50,85 Q30,80 25,65 Q20,50 30,40" 
+                          fill="#FFD700" stroke="#FFB300" stroke-width="2"/>
+                    <!-- 元宝底部 -->
+                    <ellipse cx="50" cy="75" rx="25" ry="10" fill="#FFC107"/>
+                    <!-- 元宝顶部弧形 -->
+                    <ellipse cx="50" cy="45" rx="20" ry="8" fill="#FFB300"/>
+                    <!-- 元宝中间装饰 -->
+                    <circle cx="50" cy="60" r="8" fill="#FF9800"/>
+                    <!-- 元宝两侧花纹 -->
+                    <ellipse cx="35" cy="70" rx="6" ry="3" fill="#FFC107" opacity="0.8"/>
+                    <ellipse cx="65" cy="70" rx="6" ry="3" fill="#FFC107" opacity="0.8"/>
+                </svg>`,
+                
+                // 装水的烧杯 - 液面较低
+                waterCup: `<svg viewBox="0 0 100 120">
+                    <rect x="25" y="20" width="50" height="80" rx="5" fill="#E3F2FD" stroke="#90CAF9" stroke-width="2"/>
+                    <rect x="20" y="15" width="60" height="12" rx="3" fill="#BBDEFB"/>
+                    <rect x="35" y="85" width="30" height="15" rx="2" fill="#E3F2FD"/>
+                    <!-- 水面从y=60开始，高度40，所以液面顶部在y=60 -->
+                    <rect x="25" y="60" width="50" height="40" fill="#42A5F5" opacity="0.7"/>
+                </svg>`,
+                
+                // 装元宝和水的烧杯 - 液面较高
+                goldWaterCup: `<svg viewBox="0 0 100 120">
+                    <rect x="25" y="20" width="50" height="80" rx="5" fill="#E3F2FD" stroke="#90CAF9" stroke-width="2"/>
+                    <rect x="20" y="15" width="60" height="12" rx="3" fill="#BBDEFB"/>
+                    <rect x="35" y="85" width="30" height="15" rx="2" fill="#E3F2FD"/>
+                    <!-- 水面从y=40开始，高度60，所以液面顶部在y=40 -->
+                    <rect x="25" y="40" width="50" height="60" fill="#42A5F5" opacity="0.7"/>
+                    <!-- 元宝（简化） -->
+                    <ellipse cx="50" cy="70" rx="20" ry="8" fill="#FFD700" stroke="#FFB300" stroke-width="1"/>
+                    <ellipse cx="50" cy="65" rx="15" ry="6" fill="#FFC107"/>
+                </svg>`,
+                
+                // 取走元宝的有水烧杯 - 液面最低
+                waterCupWithoutGold: `<svg viewBox="0 0 100 120">
+                    <rect x="25" y="20" width="50" height="80" rx="5" fill="#E3F2FD" stroke="#90CAF9" stroke-width="2"/>
+                    <rect x="20" y="15" width="60" height="12" rx="3" fill="#BBDEFB"/>
+                    <rect x="35" y="85" width="30" height="15" rx="2" fill="#E3F2FD"/>
+                    <!-- 水面从y=70开始，高度30，所以液面顶部在y=70 -->
+                    <rect x="25" y="70" width="50" height="30" fill="#42A5F5" opacity="0.7"/>
+                </svg>`,
+                
+                // 沾水的元宝
+                wetGold: `<svg viewBox="0 0 100 100">
+                    <!-- 元宝主体 -->
+                    <path d="M30,40 Q50,20 70,40 Q80,50 75,65 Q70,80 50,85 Q30,80 25,65 Q20,50 30,40" 
+                          fill="#FFD700" stroke="#FFB300" stroke-width="2"/>
+                    <!-- 元宝底部 -->
+                    <ellipse cx="50" cy="75" rx="25" ry="10" fill="#FFC107"/>
+                    <!-- 元宝顶部弧形 -->
+                    <ellipse cx="50" cy="45" rx="20" ry="8" fill="#FFB300"/>
+                    <!-- 元宝中间装饰 -->
+                    <circle cx="50" cy="60" r="8" fill="#FF9800"/>
+                    <!-- 沾水效果 -->
+                    <rect x="25" y="85" width="50" height="8" fill="#42A5F5" opacity="0.5"/>
+                    <ellipse cx="50" cy="90" rx="20" ry="3" fill="#42A5F5" opacity="0.5"/>
+                </svg>`
+            };
+            
+            return svgMap[type] || '<svg viewBox="0 0 100 100"><rect width="100" height="100" fill="#f5f5f5"/></svg>';
+        }
+        
+        // 创建标记后的烧杯SVG（红色虚线标记在液面上边缘）
+        function createMarkedCupSVG(waterTop) {
+            return `<svg viewBox="0 0 100 120">
+                <rect x="25" y="20" width="50" height="80" rx="5" fill="#E3F2FD" stroke="#90CAF9" stroke-width="2"/>
+                <rect x="20" y="15" width="60" height="12" rx="3" fill="#BBDEFB"/>
+                <rect x="35" y="85" width="30" height="15" rx="2" fill="#E3F2FD"/>
+                <!-- 水面从y=40开始，高度60，所以液面上边缘在y=40 -->
+                <rect x="25" y="40" width="50" height="60" fill="#42A5F5" opacity="0.7"/>
+                <!-- 元宝（简化） -->
+                <ellipse cx="50" cy="70" rx="20" ry="8" fill="#FFD700" stroke="#FFB300" stroke-width="1"/>
+                <ellipse cx="50" cy="65" rx="15" ry="6" fill="#FFC107"/>
+                <!-- 红色虚线标记线在液面上边缘（y=40） -->
+                <line x1="25" y1="${waterTop}" x2="75" y2="${waterTop}" stroke="#FF5722" stroke-width="2" stroke-dasharray="4,3"/>
+                <circle cx="75" cy="${waterTop}" r="4" fill="#FF5722"/>
+            </svg>`;
+        }
+        
+        // 创建加水后的烧杯SVG（红色虚线标记在液面上边缘）
+        function createAddedWaterCupSVG(waterTop) {
+            return `<svg viewBox="0 0 100 120">
+                <rect x="25" y="20" width="50" height="80" rx="5" fill="#E3F2FD" stroke="#90CAF9" stroke-width="2"/>
+                <rect x="20" y="15" width="60" height="12" rx="3" fill="#BBDEFB"/>
+                <rect x="35" y="85" width="30" height="15" rx="2" fill="#E3F2FD"/>
+                <!-- 水面从y=40开始，高度60，所以液面上边缘在y=40 -->
+                <rect x="25" y="40" width="50" height="60" fill="#42A5F5" opacity="0.7"/>
+                <!-- 红色虚线标记线在液面上边缘（y=40） -->
+                <line x1="25" y1="${waterTop}" x2="75" y2="${waterTop}" stroke="#FF5722" stroke-width="2" stroke-dasharray="4,3"/>
+                <circle cx="75" cy="${waterTop}" r="4" fill="#FF5722"/>
+            </svg>`;
+        }
+        
+        // 处理桌面端拖拽开始
+        function handleDragStart(e) {
+            const equipmentType = e.target.closest('.equipment-item').dataset.type;
+            const equipmentId = e.target.closest('.equipment-item').dataset.id;
+            
+            e.dataTransfer.setData('text/plain', JSON.stringify({
+                type: equipmentType,
+                id: equipmentId
+            }));
+        }
+        
+        // 移动端触摸事件处理
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let touchMoved = false;
+        let draggedItem = null;
+        let touchStartTime = 0;
+        
+        function handleTouchStart(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            touchStartX = touch.clientX;
+            touchStartY = touch.clientY;
+            touchStartTime = Date.now();
+            touchMoved = false;
+            
+            // 获取被触摸的器材
+            const equipmentItem = e.target.closest('.equipment-item');
+            if (equipmentItem) {
+                draggedItem = {
+                    type: equipmentItem.dataset.type,
+                    id: equipmentItem.dataset.id
+                };
+                
+                // 添加视觉反馈
+                equipmentItem.style.opacity = '0.7';
+                equipmentItem.style.transform = 'scale(0.95)';
+            }
+        }
+        
+        function handleTouchMove(e) {
+            if (!draggedItem) return;
+            
+            e.preventDefault();
+            const touch = e.touches[0];
+            const deltaX = Math.abs(touch.clientX - touchStartX);
+            const deltaY = Math.abs(touch.clientY - touchStartY);
+            
+            // 如果移动距离超过10px，则认为用户是在拖动而不是点击
+            if (deltaX > 10 || deltaY > 10) {
+                touchMoved = true;
+            }
+        }
+        
+        function handleTouchEnd(e) {
+            if (!draggedItem) return;
+            
+            e.preventDefault();
+            const touchEndTime = Date.now();
+            const touchDuration = touchEndTime - touchStartTime;
+            
+            // 获取触摸结束位置
+            const touch = e.changedTouches[0];
+            const endX = touch.clientX;
+            const endY = touch.clientY;
+            
+            // 恢复视觉反馈
+            const equipmentItems = document.querySelectorAll('.equipment-item');
+            equipmentItems.forEach(item => {
+                item.style.opacity = '';
+                item.style.transform = '';
+            });
+            
+            // 如果触摸时间超过200ms且移动了，认为是拖拽操作
+            if (touchDuration > 200 && touchMoved) {
+                // 检查是否拖拽到了操作区域
+                const operationArea = document.getElementById('operationArea');
+                const operationRect = operationArea.getBoundingClientRect();
+                
+                // 检查触摸结束点是否在操作区域内
+                if (endX >= operationRect.left && endX <= operationRect.right &&
+                    endY >= operationRect.top && endY <= operationRect.bottom) {
+                    // 在操作区域内，添加器材
+                    addEquipmentToOperationArea(draggedItem.type, draggedItem.id);
+                }
+            } else if (touchDuration < 200 && !touchMoved) {
+                // 短时间点击，视为点击添加（为移动设备提供更简单的操作）
+                addEquipmentToOperationArea(draggedItem.type, draggedItem.id);
+            }
+            
+            draggedItem = null;
+            touchMoved = false;
+        }
+        
+        // 初始化操作区域
+        function initOperationArea() {
+            const operationArea = document.getElementById('operationArea');
+            
+            // 桌面端：允许拖放
+            operationArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.classList.add('drag-over');
+            });
+            
+            operationArea.addEventListener('dragleave', function() {
+                this.classList.remove('drag-over');
+            });
+            
+            operationArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.classList.remove('drag-over');
+                
+                const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+                if (data && data.type) {
+                    addEquipmentToOperationArea(data.type, data.id);
+                }
+            });
+            
+            // 移动端：添加触摸事件监听
+            if (isMobileDevice) {
+                operationArea.addEventListener('touchstart', handleOperationTouchStart, { passive: false });
+                operationArea.addEventListener('touchmove', handleOperationTouchMove, { passive: false });
+                operationArea.addEventListener('touchend', handleOperationTouchEnd);
+            }
+        }
+        
+        // 操作区域的移动端触摸处理
+        let operationTouchStart = null;
+        let operationDraggedElement = null;
+        let operationOriginalPosition = null;
+        
+        function handleOperationTouchStart(e) {
+            // 检查是否触摸到了按钮，如果是按钮，则不启动拖动
+            const target = e.target;
+            if (target.tagName === 'BUTTON' || target.closest('button')) {
+                // 如果是按钮，不进行拖动操作
+                operationTouchStart = null;
+                operationDraggedElement = null;
+                return;
+            }
+            
+            // 检查是否触摸到了操作区域内的器材
+            const operationItem = e.target.closest('.operation-item');
+            if (operationItem && e.touches.length === 1) {
+                e.preventDefault();
+                const touch = e.touches[0];
+                operationTouchStart = {
+                    x: touch.clientX,
+                    y: touch.clientY,
+                    element: operationItem,
+                    time: Date.now()
+                };
+                operationDraggedElement = operationItem;
+                operationOriginalPosition = {
+                    left: operationItem.offsetLeft,
+                    top: operationItem.offsetTop
+                };
+                
+                // 添加拖动视觉反馈
+                operationItem.style.opacity = '0.7';
+                operationItem.style.zIndex = '1000';
+            }
+        }
+        
+        function handleOperationTouchMove(e) {
+            if (!operationDraggedElement || e.touches.length !== 1) return;
+            
+            const touch = e.touches[0];
+            const deltaX = touch.clientX - operationTouchStart.x;
+            const deltaY = touch.clientY - operationTouchStart.y;
+            
+            // 如果移动距离大于5px，才认为是拖动
+            if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) {
+                e.preventDefault();
+                // 移动元素
+                operationDraggedElement.style.position = 'relative';
+                operationDraggedElement.style.left = deltaX + 'px';
+                operationDraggedElement.style.top = deltaY + 'px';
+            }
+        }
+        
+        function handleOperationTouchEnd(e) {
+            if (!operationDraggedElement) return;
+            
+            // 恢复元素位置
+            operationDraggedElement.style.opacity = '';
+            operationDraggedElement.style.zIndex = '';
+            operationDraggedElement.style.position = '';
+            operationDraggedElement.style.left = '';
+            operationDraggedElement.style.top = '';
+            
+            operationTouchStart = null;
+            operationDraggedElement = null;
+            operationOriginalPosition = null;
+        }
+        
+        // 获取操作区域中所有器材项的数组
+        function getOperationItemsArray() {
+            return Array.from(document.querySelectorAll('.operation-item'));
+        }
+        
+        // 交换两个器材项的位置
+        function swapItems(item1, item2) {
+            if (!item1 || !item2) return;
+            
+            const parent = item1.parentNode;
+            const item1NextSibling = item1.nextSibling;
+            const item2NextSibling = item2.nextSibling;
+            
+            // 交换两个元素
+            parent.insertBefore(item1, item2NextSibling);
+            parent.insertBefore(item2, item1NextSibling);
+            
+            // 更新箭头按钮状态
+            updateArrowButtons();
+        }
+        
+        // 更新所有箭头按钮的状态
+        function updateArrowButtons() {
+            const items = getOperationItemsArray();
+            
+            items.forEach((item, index) => {
+                const leftArrow = item.querySelector('.left-arrow');
+                const rightArrow = item.querySelector('.right-arrow');
+                
+                if (leftArrow && rightArrow) {
+                    // 更新左箭头状态
+                    if (index === 0) {
+                        leftArrow.disabled = true;
+                    } else {
+                        leftArrow.disabled = false;
+                    }
+                    
+                    // 更新右箭头状态
+                    if (index === items.length - 1) {
+                        rightArrow.disabled = true;
+                    } else {
+                        rightArrow.disabled = false;
+                    }
+                }
+            });
+        }
+        
+        // 添加器材到操作区域
+        function addEquipmentToOperationArea(type, originalId) {
+            const operationArea = document.getElementById('operationArea');
+            
+            // 查找对应的器材数据
+            let equipment;
+            if (originalId) {
+                equipment = equipmentData.find(item => item.id == originalId);
+            } else {
+                equipment = equipmentData.find(item => item.type === type);
+            }
+            
+            if (!equipment) {
+                // 如果是标记后的器材
+                if (type === 'markedGoldWaterCup') {
+                    equipment = markedEquipment;
+                }
+                // 如果是加水后的器材
+                if (type === 'addedWaterCup') {
+                    equipment = addedWaterEquipment;
+                }
+            }
+            
+            if (!equipment) return;
+            
+            // 创建操作区域器材元素
+            const itemId = nextItemId++;
+            const item = document.createElement('div');
+            item.className = 'operation-item';
+            item.dataset.id = itemId;
+            item.dataset.type = equipment.type;
+            item.dataset.originalId = equipment.id || originalId;
+            item.dataset.hasWaterAdded = "false"; // 标记是否已加水
+            
+            // 创建图片容器
+            const imgContainer = document.createElement('div');
+            imgContainer.className = 'operation-img-container';
+            
+            // 创建图片
+            const img = document.createElement('div');
+            img.className = 'operation-img';
+            img.style.backgroundColor = getEquipmentColor(equipment.type);
+            
+            // 根据器材类型设置SVG
+            if (equipment.type === 'markedGoldWaterCup') {
+                img.innerHTML = createMarkedCupSVG(40); // 液面上边缘在y=40
+            } else if (equipment.type === 'addedWaterCup') {
+                img.innerHTML = createAddedWaterCupSVG(40); // 液面上边缘在y=40
+            } else {
+                img.innerHTML = createEquipmentSVG(equipment.type);
+            }
+            
+            // 为移动端添加触摸事件
+            if (isMobileDevice) {
+                img.addEventListener('touchstart', function(e) {
+                    if (e.touches.length === 1) {
+                        // 阻止默认行为，防止滚动
+                        e.preventDefault();
+                    }
+                }, { passive: false });
+            }
+            
+            // 创建删除按钮
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'delete-btn';
+            deleteBtn.innerHTML = '×';
+            
+            // 统一的事件处理函数
+            const handleDeleteClick = function() {
+                deleteEquipment(itemId);
+            };
+            
+            // 同时绑定点击和触摸结束事件
+            deleteBtn.addEventListener('click', handleDeleteClick);
+            deleteBtn.addEventListener('touchend', function(e) {
+                e.preventDefault();
+                handleDeleteClick();
+            });
+            
+            imgContainer.appendChild(img);
+            imgContainer.appendChild(deleteBtn);
+            
+            // 创建位置控制按钮
+            const positionControls = document.createElement('div');
+            positionControls.className = 'position-controls';
+            
+            const leftArrow = document.createElement('button');
+            leftArrow.className = 'arrow-btn left-arrow';
+            leftArrow.innerHTML = '←';
+            
+            const handleLeftArrowClick = function() {
+                moveItemLeft(itemId);
+            };
+            
+            leftArrow.addEventListener('click', handleLeftArrowClick);
+            leftArrow.addEventListener('touchend', function(e) {
+                e.preventDefault();
+                handleLeftArrowClick();
+            });
+            
+            const rightArrow = document.createElement('button');
+            rightArrow.className = 'arrow-btn right-arrow';
+            rightArrow.innerHTML = '→';
+            
+            const handleRightArrowClick = function() {
+                moveItemRight(itemId);
+            };
+            
+            rightArrow.addEventListener('click', handleRightArrowClick);
+            rightArrow.addEventListener('touchend', function(e) {
+                e.preventDefault();
+                handleRightArrowClick();
+            });
+            
+            positionControls.appendChild(leftArrow);
+            positionControls.appendChild(rightArrow);
+            
+            // 创建按钮区域
+            const buttons = document.createElement('div');
+            buttons.className = 'operation-buttons';
+            
+            // 添加测质量按钮
+            const measureBtn = document.createElement('button');
+            measureBtn.className = 'btn btn-measure';
+            measureBtn.textContent = '测质量';
+            
+            const handleMeasureClick = function() {
+                measureMass(itemId, equipment.type, item.dataset.hasWaterAdded === "true");
+            };
+            
+            measureBtn.addEventListener('click', handleMeasureClick);
+            measureBtn.addEventListener('touchend', function(e) {
+                e.preventDefault();
+                handleMeasureClick();
+            });
+            
+            buttons.appendChild(measureBtn);
+            
+            // 根据器材类型添加其他按钮
+            if (equipment.type === 'goldWaterCup' || equipment.type === 'markedGoldWaterCup') {
+                const markBtn = document.createElement('button');
+                markBtn.className = 'btn btn-mark';
+                markBtn.textContent = '做标记';
+                
+                const handleMarkClick = function() {
+                    markEquipment(itemId);
+                };
+                
+                markBtn.addEventListener('click', handleMarkClick);
+                markBtn.addEventListener('touchend', function(e) {
+                    e.preventDefault();
+                    handleMarkClick();
+                });
+                
+                // 如果已经是标记状态，禁用按钮
+                if (equipment.type === 'markedGoldWaterCup') {
+                    markBtn.disabled = true;
+                    markBtn.style.opacity = '0.5';
+                    markBtn.style.cursor = 'not-allowed';
+                }
+                
+                buttons.appendChild(markBtn);
+            }
+            
+            if (equipment.type === 'waterCupWithoutGold' || equipment.type === 'addedWaterCup') {
+                const addWaterBtn = document.createElement('button');
+                addWaterBtn.className = 'btn btn-add-water';
+                addWaterBtn.textContent = '加水';
+                
+                const handleAddWaterClick = function() {
+                    addWater(itemId);
+                };
+                
+                addWaterBtn.addEventListener('click', handleAddWaterClick);
+                addWaterBtn.addEventListener('touchend', function(e) {
+                    e.preventDefault();
+                    handleAddWaterClick();
+                });
+                
+                // 如果已经是加水状态，禁用按钮
+                if (equipment.type === 'addedWaterCup') {
+                    addWaterBtn.disabled = true;
+                    addWaterBtn.style.opacity = '0.5';
+                    addWaterBtn.style.cursor = 'not-allowed';
+                }
+                
+                buttons.appendChild(addWaterBtn);
+            }
+            
+            // 创建质量标签
+            const massLabel = document.createElement('div');
+            massLabel.className = 'mass-label';
+            massLabel.id = `mass-label-${itemId}`;
+            
+            item.appendChild(imgContainer);
+            item.appendChild(positionControls);
+            item.appendChild(buttons);
+            item.appendChild(massLabel);
+            
+            operationArea.appendChild(item);
+            operationItems.push({id: itemId, type: equipment.type});
+            
+            // 更新操作区域状态
+            updateOperationAreaStatus();
+            
+            // 更新箭头按钮状态
+            updateArrowButtons();
+            
+            return itemId;
+        }
+        
+        // 删除器材
+        function deleteEquipment(itemId) {
+            const item = document.querySelector(`.operation-item[data-id="${itemId}"]`);
+            if (!item) return;
+            
+            // 从DOM中移除
+            item.remove();
+            
+            // 从操作项目列表中移除
+            const index = operationItems.findIndex(item => item.id == itemId);
+            if (index !== -1) {
+                operationItems.splice(index, 1);
+            }
+            
+            // 更新操作区域状态
+            updateOperationAreaStatus();
+            
+            // 更新箭头按钮状态
+            updateArrowButtons();
+        }
+        
+        // 向左移动器材
+        function moveItemLeft(itemId) {
+            const items = getOperationItemsArray();
+            const currentIndex = items.findIndex(item => item.dataset.id == itemId);
+            
+            if (currentIndex > 0) {
+                const prevItem = items[currentIndex - 1];
+                const currentItem = items[currentIndex];
+                swapItems(currentItem, prevItem);
+            }
+        }
+        
+        // 向右移动器材
+        function moveItemRight(itemId) {
+            const items = getOperationItemsArray();
+            const currentIndex = items.findIndex(item => item.dataset.id == itemId);
+            
+            if (currentIndex < items.length - 1) {
+                const nextItem = items[currentIndex + 1];
+                const currentItem = items[currentIndex];
+                swapItems(currentItem, nextItem);
+            }
+        }
+        
+        // 测量质量 - 根据是否加水显示不同的符号
+        function measureMass(itemId, type, hasWaterAdded = false) {
+            const massLabel = document.getElementById(`mass-label-${itemId}`);
+            const item = document.querySelector(`.operation-item[data-id="${itemId}"]`);
+            
+            if (!massLabel || !item) return;
+            
+            // 根据器材类型确定质量符号
+            let massSymbol;
+            
+            // 如果是加水后的烧杯，质量符号是m5
+            if (type === 'addedWaterCup' || (type === 'waterCupWithoutGold' && hasWaterAdded)) {
+                massSymbol = 'm₅';
+                experimentData.m5 = true;
+            } else {
+                // 查找对应的器材数据
+                const equipment = equipmentData.find(item => item.type === type);
+                if (!equipment) {
+                    // 检查是否是标记后的器材
+                    if (type === 'markedGoldWaterCup') {
+                        massSymbol = 'm₂';
+                        experimentData.m2 = true;
+                    } else {
+                        return;
+                    }
+                } else {
+                    massSymbol = equipment.massSymbol;
+                    
+                    // 更新实验数据状态
+                    switch(type) {
+                        case 'gold':
+                            experimentData.m0 = true;
+                            break;
+                        case 'waterCup':
+                            experimentData.m1 = true;
+                            break;
+                        case 'goldWaterCup':
+                            experimentData.m2 = true;
+                            break;
+                        case 'waterCupWithoutGold':
+                            experimentData.m3 = true;
+                            break;
+                        case 'wetGold':
+                            experimentData.m4 = true;
+                            break;
+                    }
+                }
+            }
+            
+            massLabel.textContent = massSymbol;
+        }
+        
+        // 标记器材（装元宝和水的烧杯）
+        function markEquipment(itemId) {
+            const item = document.querySelector(`.operation-item[data-id="${itemId}"]`);
+            if (!item) return;
+            
+            // 更新类型
+            item.dataset.type = 'markedGoldWaterCup';
+            
+            // 更新图片
+            const img = item.querySelector('.operation-img');
+            img.style.backgroundColor = getEquipmentColor('markedGoldWaterCup');
+            img.innerHTML = createMarkedCupSVG(40); // 液面上边缘在y=40
+            
+            // 禁用标记按钮
+            const markBtn = item.querySelector('.btn-mark');
+            if (markBtn) {
+                markBtn.disabled = true;
+                markBtn.style.opacity = '0.5';
+                markBtn.style.cursor = 'not-allowed';
+            }
+            
+            // 更新操作项目列表
+            const opItemIndex = operationItems.findIndex(item => item.id == itemId);
+            if (opItemIndex !== -1) {
+                operationItems[opItemIndex].type = 'markedGoldWaterCup';
+            }
+        }
+        
+        // 加水操作（取走元宝的有水烧杯）
+        function addWater(itemId) {
+            const item = document.querySelector(`.operation-item[data-id="${itemId}"]`);
+            if (!item) return;
+            
+            // 更新类型
+            item.dataset.type = 'addedWaterCup';
+            item.dataset.hasWaterAdded = "true";
+            
+            // 更新图片
+            const img = item.querySelector('.operation-img');
+            img.style.backgroundColor = getEquipmentColor('addedWaterCup');
+            img.innerHTML = createAddedWaterCupSVG(40); // 液面上边缘在y=40
+            
+            // 禁用加水按钮
+            const addWaterBtn = item.querySelector('.btn-add-water');
+            if (addWaterBtn) {
+                addWaterBtn.disabled = true;
+                addWaterBtn.style.opacity = '0.5';
+                addWaterBtn.style.cursor = 'not-allowed';
+            }
+            
+            // 更新操作项目列表
+            const opItemIndex = operationItems.findIndex(item => item.id == itemId);
+            if (opItemIndex !== -1) {
+                operationItems[opItemIndex].type = 'addedWaterCup';
+            }
+            
+            // 清除之前可能显示的质量符号，等待重新测量
+            const massLabel = document.getElementById(`mass-label-${itemId}`);
+            if (massLabel) {
+                massLabel.textContent = '';
+            }
+        }
+        
+        // 更新操作区域状态
+        function updateOperationAreaStatus() {
+            const operationArea = document.getElementById('operationArea');
+            if (operationItems.length === 0) {
+                operationArea.classList.add('empty');
+            } else {
+                operationArea.classList.remove('empty');
+            }
+        }
+        
+        // ==================== 绘图功能 ====================
+        
+        // 初始化绘图功能
+        function initDrawing() {
+            canvas = document.getElementById('drawingCanvas');
+            ctx = canvas.getContext('2d');
+            
+            // 设置画布大小与容器相同
+            resizeCanvas();
+            
+            // 监听窗口大小变化
+            window.addEventListener('resize', resizeCanvas);
+            
+            // 设置初始绘图样式
+            ctx.strokeStyle = currentColor;
+            ctx.lineWidth = lineWidth;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            
+            // 绑定绘图按钮事件
+            const drawBtn = document.getElementById('drawBtn');
+            const eraseBtn = document.getElementById('eraseBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const lineWidthInput = document.getElementById('lineWidth');
+            const colorOptions = document.querySelectorAll('.color-option');
+            const drawingHint = document.getElementById('drawingHint');
+            
+            // 绘图模式按钮
+            drawBtn.addEventListener('click', function() {
+                isErasing = false;
+                drawBtn.style.backgroundColor = '#2E7D32'; // 深绿色表示激活
+                eraseBtn.style.backgroundColor = '#FF9800'; // 恢复橙色
+                ctx.globalCompositeOperation = 'source-over'; // 正常绘制模式
+                ctx.strokeStyle = currentColor;
+            });
+            
+            drawBtn.addEventListener('touchend', function(e) {
+                e.preventDefault();
+                isErasing = false;
+                drawBtn.style.backgroundColor = '#2E7D32';
+                eraseBtn.style.backgroundColor = '#FF9800';
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.strokeStyle = currentColor;
+            });
+            
+            // 橡皮擦按钮
+            eraseBtn.addEventListener('click', function() {
+                isErasing = true;
+                eraseBtn.style.backgroundColor = '#E65100'; // 深橙色表示激活
+                drawBtn.style.backgroundColor = '#4CAF50'; // 恢复绿色
+                ctx.globalCompositeOperation = 'destination-out'; // 擦除模式
+            });
+            
+            eraseBtn.addEventListener('touchend', function(e) {
+                e.preventDefault();
+                isErasing = true;
+                eraseBtn.style.backgroundColor = '#E65100';
+                drawBtn.style.backgroundColor = '#4CAF50';
+                ctx.globalCompositeOperation = 'destination-out';
+            });
+            
+            // 清除按钮
+            clearBtn.addEventListener('click', function() {
+                clearCanvas();
+            });
+            
+            clearBtn.addEventListener('touchend', function(e) {
+                e.preventDefault();
+                clearCanvas();
+            });
+            
+            // 线条粗细控制
+            lineWidthInput.addEventListener('input', function() {
+                lineWidth = this.value;
+                ctx.lineWidth = lineWidth;
+            });
+            
+            // 颜色选择器
+            colorOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    // 移除所有active类
+                    colorOptions.forEach(opt => opt.classList.remove('active'));
+                    // 添加active类到当前选项
+                    this.classList.add('active');
+                    // 更新当前颜色
+                    currentColor = this.dataset.color;
+                    if (!isErasing) {
+                        ctx.strokeStyle = currentColor;
+                    }
+                });
+                
+                // 移动端支持
+                option.addEventListener('touchend', function(e) {
+                    e.preventDefault();
+                    colorOptions.forEach(opt => opt.classList.remove('active'));
+                    this.classList.add('active');
+                    currentColor = this.dataset.color;
+                    if (!isErasing) {
+                        ctx.strokeStyle = currentColor;
+                    }
+                });
+            });
+            
+            // 添加绘图事件监听
+            if (isMobileDevice) {
+                // 移动设备使用触摸事件
+                canvas.addEventListener('touchstart', startDrawing);
+                canvas.addEventListener('touchmove', draw);
+                canvas.addEventListener('touchend', stopDrawing);
+                
+                // 在触摸开始时隐藏提示
+                canvas.addEventListener('touchstart', function() {
+                    drawingHint.classList.add('hidden');
+                });
+            } else {
+                // 桌面设备使用鼠标事件
+                canvas.addEventListener('mousedown', startDrawing);
+                canvas.addEventListener('mousemove', draw);
+                canvas.addEventListener('mouseup', stopDrawing);
+                canvas.addEventListener('mouseout', stopDrawing);
+            }
+        }
+        
+        // 调整画布大小
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+            
+            // 重新绘制保存的内容（如果有）
+            redrawCanvas();
+        }
+        
+        // 开始绘图
+        function startDrawing(e) {
+            isDrawing = true;
+            
+            // 获取触摸点坐标
+            const coords = getCoordinates(e);
+            if (!coords) return;
+            
+            [lastX, lastY] = coords;
+            
+            // 开始新的路径
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            
+            // 绘制一个点（为了确保轻触也能留下痕迹）
+            ctx.lineTo(lastX, lastY);
+            ctx.stroke();
+        }
+        
+        // 绘图
+        function draw(e) {
+            if (!isDrawing) return;
+            
+            e.preventDefault();
+            
+            // 获取触摸点坐标
+            const coords = getCoordinates(e);
+            if (!coords) return;
+            
+            const [x, y] = coords;
+            
+            // 在移动设备上，我们可以根据压力调整线条粗细（如果有压力感应）
+            if (isMobileDevice && e.touches && e.touches[0]) {
+                // 尝试获取压力值（某些设备支持）
+                const touch = e.touches[0];
+                let pressure = 1.0;
+                
+                // 检查是否有压力属性
+                if (touch.force !== undefined) {
+                    pressure = touch.force || 1.0;
+                    // 根据压力调整线条粗细（压力越大线条越粗）
+                    const adjustedLineWidth = lineWidth * (0.5 + pressure * 0.5);
+                    ctx.lineWidth = Math.min(adjustedLineWidth, 30); // 限制最大粗细
+                }
+            }
+            
+            // 绘制线条
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            
+            // 更新最后位置
+            lastX = x;
+            lastY = y;
+        }
+        
+        // 停止绘图
+        function stopDrawing() {
+            if (isDrawing) {
+                isDrawing = false;
+                ctx.closePath();
+                
+                // 恢复默认线条粗细
+                ctx.lineWidth = lineWidth;
+            }
+        }
+        
+        // 获取坐标（处理触摸和鼠标事件）
+        function getCoordinates(e) {
+            let clientX, clientY;
+            
+            if (isMobileDevice && e.touches) {
+                // 触摸事件
+                if (e.touches.length === 0) return null;
+                const touch = e.touches[0];
+                clientX = touch.clientX;
+                clientY = touch.clientY;
+            } else {
+                // 鼠标事件
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+            
+            // 获取画布相对于视口的位置
+            const rect = canvas.getBoundingClientRect();
+            
+            // 计算画布内的坐标
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
+            
+            return [x, y];
+        }
+        
+        // 清除画布
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // 显示绘图提示
+            document.getElementById('drawingHint').classList.remove('hidden');
+        }
+        
+        // 重新绘制画布（用于调整大小时）
+        function redrawCanvas() {
+            // 这里可以保存和恢复绘图内容
+            // 由于我们使用Canvas API，调整大小时内容会丢失
+            // 在实际应用中，可以保存绘图数据并在调整大小后重新绘制
+        }
+        
+        // 重置实验（同时重置绘图）
+        function resetExperiment() {
+            const operationArea = document.getElementById('operationArea');
+            operationArea.innerHTML = '';
+            operationItems = [];
+            
+            // 重置实验数据
+            experimentData = {
+                m0: false,
+                m1: false,
+                m2: false,
+                m3: false,
+                m4: false,
+                m5: false
+            };
+            
+            // 重置结果显示
+            document.getElementById('volumeResult').innerHTML = `V<sub>元宝</sub> = `;
+            document.getElementById('densityResult').innerHTML = `ρ<sub>元宝</sub> = `;
+            
+            // 清除绘图
+            clearCanvas();
+            
+            // 重置绘图模式
+            isErasing = false;
+            const drawBtn = document.getElementById('drawBtn');
+            const eraseBtn = document.getElementById('eraseBtn');
+            drawBtn.style.backgroundColor = '#4CAF50';
+            eraseBtn.style.backgroundColor = '#FF9800';
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.strokeStyle = currentColor;
+            
+            updateOperationAreaStatus();
+        }
+        
+        // 初始化页面
+        function initPage() {
+            initEquipmentArea();
+            initOperationArea();
+            initDrawing();
+            
+            // 添加重置按钮事件
+            const resetBtn = document.getElementById('resetBtn');
+            resetBtn.addEventListener('click', resetExperiment);
+            resetBtn.addEventListener('touchend', function(e) {
+                e.preventDefault();
+                resetExperiment();
+            });
+            
+            // 初始添加一些器材到操作区域作为示例
+            setTimeout(() => {
+                addEquipmentToOperationArea('gold', 1);
+                addEquipmentToOperationArea('waterCup', 2);
+                addEquipmentToOperationArea('goldWaterCup', 3);
+            }, 500);
+            
+            // 在移动设备上显示额外提示
+            if (isMobileDevice) {
+                console.log('检测到移动设备，已启用触摸事件支持');
+            }
+            
+            if (isIOS) {
+                console.log('检测到iOS设备，已针对iPad/iPhone优化');
+            }
+        }
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', initPage);
+    </script>
+</body>
+</html>

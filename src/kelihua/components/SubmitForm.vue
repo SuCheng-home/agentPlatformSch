@@ -66,7 +66,7 @@
       <el-input v-model.trim="form.url" placeholder="https://（智能体或工具的使用链接）" />
     </el-form-item>
 
-    <el-form-item v-if="form.type !== 'tool'" :label="form.type === 'agent' ? '智能体提示词说明' : '提示词内容'" prop="prompt">
+    <el-form-item :label="form.type === 'agent' ? '人设与回复设定' : '提示词内容'" :prop="form.type === 'prompt' ? 'prompt' : undefined">
       <el-input
         v-model="form.prompt"
         type="textarea"

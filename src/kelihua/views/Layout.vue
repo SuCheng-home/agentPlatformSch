@@ -47,6 +47,7 @@
       </div>
     </header>
 
+    <p v-if="isWorkflow" class="workflow-notice">功能状态：本地流程演示，提交与审核接口未提供；待审核记录仅本次页面有效，发布后的资源保存到当前浏览器。</p>
     <router-view />
     <resource-drawer />
   </div>
@@ -55,7 +56,7 @@
 <script>
 import logo from '../assets/logo.png';
 import KlhIcon from '../components/KlhIcon.vue';
-import ResourceDrawer from '../components/ResourceDrawer.vue';
+import ResourceDrawer from '../components/resource-drawer.vue';
 import state, { actions, getters, ROLES, DEMO_MODE } from '../store';
 import { logoutRmCookies } from '@/utils/auth';
 
@@ -66,6 +67,7 @@ export default {
     return { logo, roles: ROLES, demoMode: DEMO_MODE, state };
   },
   computed: {
+    isWorkflow() { return ['/kelihua/build', '/kelihua/review'].includes(this.$route.path); },
     roleInfo() {
       return getters.roleInfo();
     },
@@ -109,6 +111,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.workflow-notice { margin: 20px auto 0; padding: 12px 20px; max-width: 1340px; color: #8f551f; background: var(--klh-orange-tint); font-size: 13px; }
 .klh-shell {
   min-height: 100vh;
 }
