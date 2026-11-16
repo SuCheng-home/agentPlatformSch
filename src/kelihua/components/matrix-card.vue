@@ -70,7 +70,7 @@ export default {
   flex-direction: column;
   border-radius: 16px;
   background: var(--klh-white);
-  box-shadow: 0 0 0 1px var(--klh-line), var(--klh-shadow);
+  box-shadow: 0 0 0 1.5px var(--klh-line-strong), var(--klh-shadow);
   overflow: hidden;
   transition: transform 0.2s, box-shadow 0.2s;
 
@@ -113,7 +113,7 @@ export default {
     left: 0;
     right: 0;
     bottom: 0;
-    height: 3px;
+    height: 4px;
     background: var(--accent);
   }
 }
@@ -136,19 +136,19 @@ export default {
   height: 26px;
   padding: 0 10px;
   border-radius: 999px;
-  background: var(--klh-white);
-  box-shadow: 0 2px 8px rgba(23, 32, 58, 0.12);
-  color: var(--accent);
+  background: var(--accent);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  color: var(--klh-white);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.06em;
 
   &::before {
     content: '';
-    width: 8px;
-    height: 8px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
-    background: var(--accent);
+    background: var(--klh-white);
   }
 }
 
@@ -207,7 +207,8 @@ export default {
   &:hover { filter: brightness(0.92); }
 
   &--ghost {
-    background: var(--accent-tint);
+    background: var(--klh-white);
+    box-shadow: inset 0 0 0 1.5px var(--accent);
     color: var(--accent);
   }
 }

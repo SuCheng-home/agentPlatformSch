@@ -152,7 +152,8 @@ export default {
   padding: 10px;
   border-radius: 18px;
   background: var(--klh-white);
-  border: 1px solid var(--klh-line);
+  border: 1.5px solid var(--klh-line-strong);
+  box-shadow: var(--klh-shadow);
 }
 
 .domain {
@@ -215,11 +216,12 @@ export default {
   margin-bottom: 20px;
   padding: 22px 24px;
   border-radius: 18px;
-  background: var(--klh-ink);
+  background: linear-gradient(110deg, var(--klh-blue) 0%, var(--klh-blue-deep) 100%);
   color: var(--klh-white);
+  box-shadow: 0 18px 32px -24px var(--klh-blue-deep);
 
-  h2 { font-size: 22px; font-weight: 800; }
-  p { margin-top: 4px; font-size: 14px; color: rgba(255, 255, 255, 0.7); }
+  h2 { font-size: 24px; font-weight: 800; }
+  p { margin-top: 4px; font-size: 14px; color: rgba(255, 255, 255, 0.88); }
 }
 
 .edu__split {
@@ -227,12 +229,12 @@ export default {
   gap: 4px;
   padding: 4px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.22);
 
   .klh-chip {
-    color: rgba(255, 255, 255, 0.75);
-    &:hover { background: rgba(255, 255, 255, 0.1); color: var(--klh-white); }
-    &.is-active { background: var(--klh-white); color: var(--klh-ink); }
+    color: rgba(255, 255, 255, 0.9);
+    &:hover { background: rgba(255, 255, 255, 0.14); color: var(--klh-white); }
+    &.is-active { background: var(--klh-white); color: var(--klh-blue-deep); font-weight: 700; }
   }
 }
 
@@ -245,14 +247,15 @@ export default {
   align-items: center;
   gap: 10px;
   margin-bottom: 12px;
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 800;
+  color: var(--klh-blue-deep);
 
   &::after {
     content: '';
     flex: 1;
-    height: 1px;
-    background: var(--klh-line);
+    height: 1.5px;
+    background: var(--klh-line-strong);
   }
 }
 

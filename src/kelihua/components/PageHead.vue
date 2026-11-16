@@ -42,7 +42,7 @@ export default {
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.12em;
-  color: var(--klh-muted);
+  color: var(--klh-blue-deep);
 }
 
 .page-head__glyph {

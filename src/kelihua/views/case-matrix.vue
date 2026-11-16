@@ -256,8 +256,9 @@ export default {
 
   &:hover { background: var(--klh-ink-tint); }
   &.is-active {
-    background: var(--klh-blue-tint);
-    strong { color: var(--klh-blue); }
+    background: var(--klh-teal);
+    color: var(--klh-white);
+    small, span { color: rgba(255, 255, 255, 0.85); }
   }
 }
 
@@ -265,14 +266,15 @@ export default {
   position: relative;
   padding: 26px 28px;
   border-radius: 18px;
-  background: var(--klh-white);
-  border: 1px solid var(--klh-line);
+  background: linear-gradient(115deg, var(--klh-teal) 0%, #064843 100%);
+  color: var(--klh-white);
+  box-shadow: 0 18px 32px -24px #064843;
   overflow: hidden;
 }
 
 .unit-hero__crumb {
   font-size: 13px;
-  color: var(--klh-muted);
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .unit-hero__title {
@@ -285,13 +287,13 @@ export default {
 .unit-hero__idea {
   margin-top: 10px;
   font-size: 15px;
-  color: var(--klh-ink);
+  color: var(--klh-white);
 
   span {
     margin-right: 10px;
     padding: 2px 8px;
     border-radius: 6px;
-    background: var(--klh-ink-tint);
+    background: rgba(255, 255, 255, 0.18);
     font-size: 12px;
     font-weight: 700;
     vertical-align: 1px;
@@ -305,22 +307,26 @@ export default {
   margin-top: 18px;
   padding: 16px 18px;
   border-radius: 12px;
-  background: var(--klh-orange-tint);
+  background: var(--klh-white);
+  color: var(--klh-ink);
 
   p { font-size: 15px; font-weight: 600; }
 }
 
 .unit-hero__task-tag {
   flex-shrink: 0;
+  padding: 2px 10px;
+  border-radius: 6px;
+  background: var(--klh-orange);
   font-size: 13px;
   font-weight: 800;
-  color: #b85a08;
+  color: var(--klh-white);
 }
 
 .unit-hero__by {
   margin-top: 14px;
-  font-size: 12px;
-  color: var(--klh-faint);
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .lessons-head {
@@ -335,7 +341,7 @@ export default {
     gap: 10px;
     font-size: 18px;
     font-weight: 800;
-    &::before { content: ''; width: 4px; height: 18px; border-radius: 2px; background: var(--klh-blue); }
+    &::before { content: ''; width: 5px; height: 20px; border-radius: 2px; background: var(--klh-teal); }
   }
   span { font-size: 13px; color: var(--klh-muted); }
 }
@@ -369,10 +375,10 @@ export default {
   padding: 18px 20px 18px 0;
   border-radius: 16px;
   background: var(--klh-white);
-  border: 1px solid var(--klh-line);
+  border: 1.5px solid var(--klh-line-strong);
   transition: border-color 0.2s, box-shadow 0.2s;
 
-  &:hover { border-color: var(--klh-line-strong); box-shadow: var(--klh-shadow); }
+  &:hover { border-color: var(--klh-teal); box-shadow: var(--klh-shadow); }
 }
 
 .lesson__no {
@@ -385,11 +391,11 @@ export default {
   width: 58px;
   padding: 6px 0;
   border-radius: 12px;
-  background: var(--klh-paper);
-  border: 1px solid var(--klh-line);
+  background: var(--klh-ink);
+  border: 1px solid var(--klh-ink);
 
-  small { font-size: 11px; color: var(--klh-muted); }
-  strong { font-size: 24px; font-weight: 800; line-height: 1.1; font-variant-numeric: tabular-nums; color: var(--klh-ink); }
+  small { font-size: 11px; color: rgba(255, 255, 255, 0.8); }
+  strong { font-size: 24px; font-weight: 800; line-height: 1.1; font-variant-numeric: tabular-nums; color: var(--klh-white); }
 
   .lesson--ai & {
     background: var(--klh-blue);
@@ -419,7 +425,7 @@ export default {
   font-weight: 700;
 
   &--ai { background: var(--klh-blue); color: var(--klh-white); }
-  &--featured { background: var(--klh-orange-tint); color: #b85a08; }
+  &--featured { background: var(--klh-orange); color: var(--klh-white); }
 }
 
 .lesson__goal {
@@ -441,8 +447,8 @@ export default {
   align-items: center;
   gap: 5px;
   font-size: 13px;
+  font-weight: 600;
   color: var(--klh-ink);
-  opacity: 0.8;
 
   &--agent {
     padding: 3px 10px;
