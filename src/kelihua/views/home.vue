@@ -52,7 +52,7 @@
 import KlhIcon from '../components/KlhIcon.vue';
 import UserMenu from '../components/user-menu.vue';
 import logo from '../assets/logo.png';
-import heroImg from '../assets/home-hero-ai.webp';
+import heroImg from '../assets/home-hero-matrix.webp';
 import iconSubject from '../assets/icons/mx-subject.webp';
 import iconEducation from '../assets/icons/mx-education.webp';
 import iconCourse from '../assets/icons/mx-course.webp';
@@ -135,7 +135,7 @@ export default {
   }
 }
 
-/* AI 主视觉：神经网络大脑 + 电路纹亭台 + 发光书本，左侧留深蓝给标题 */
+/* AI 主视觉：玻璃立方矩阵 + 光流汇聚至智能核心，左侧留深蓝给标题 */
 .hero__art {
   position: absolute;
   inset: 0 0 0 auto;
