@@ -1,10 +1,14 @@
 <template>
   <div class="home">
-    <section class="hero" aria-labelledby="klh-home-title" :style="{ backgroundImage: `url(${heroImg})` }">
-      <header class="hero__brand">
-        <img :src="logo" alt="南京市科利华中学校徽" width="44" height="44" />
-        <span class="klh-brush hero__brand-zh">科智汇</span>
-        <span class="hero__brand-sub">AI 矩阵平台</span>
+    <section class="hero" aria-labelledby="klh-home-title">
+      <img class="hero__art" :src="heroImg" alt="" aria-hidden="true" />
+
+      <header class="hero__bar">
+        <div class="hero__brand">
+          <img :src="logo" alt="南京市科利华中学校徽" width="44" height="44" />
+          <span class="hero__school">南京市科利华中学</span>
+        </div>
+        <user-menu />
       </header>
 
       <div class="hero__center">
@@ -15,39 +19,32 @@
         <p class="hero__motto">
           <span class="rule" aria-hidden="true" />
           汇聚教育智慧<span class="gap" aria-hidden="true" />赋能师生成长
-          <span class="rule" aria-hidden="true" />
         </p>
       </div>
 
       <p class="hero__greet">{{ today }} · {{ teacherName }}，{{ greeting }}</p>
     </section>
 
-    <aside class="side">
-      <div class="side__top">
-        <user-menu />
-      </div>
+    <nav class="entries" aria-label="三大矩阵入口">
+      <router-link v-for="m in matrices" :key="m.key" :to="m.to" :class="['entry', `entry--${m.key}`]">
+        <span class="entry__icon"><img :src="m.icon" alt="" width="96" height="96" /></span>
+        <span class="entry__text">
+          <strong class="entry__title">{{ m.title }}</strong>
+          <span class="entry__sub">{{ m.sub }}</span>
+        </span>
+        <span class="entry__arrow" aria-hidden="true">
+          <klh-icon name="arrowRight" :size="20" :stroke="2.2" />
+        </span>
+      </router-link>
+    </nav>
 
-      <nav class="entries" aria-label="三大矩阵入口">
-        <router-link v-for="m in matrices" :key="m.key" :to="m.to" :class="['entry', `entry--${m.key}`]">
-          <span class="entry__icon"><img :src="m.icon" alt="" width="96" height="96" /></span>
-          <span class="entry__text">
-            <strong class="entry__title">{{ m.title }}</strong>
-            <span class="entry__sub">{{ m.sub }}</span>
-          </span>
-          <span class="entry__arrow" aria-hidden="true">
-            <klh-icon name="arrowRight" :size="20" :stroke="2" />
-          </span>
-        </router-link>
-      </nav>
-
-      <nav class="quick" aria-label="更多栏目">
-        <router-link v-for="item in extras" :key="item.to" :to="item.to" class="quick__link">
-          <klh-icon :name="item.icon" :size="18" />
-          {{ item.label }}
-          <span v-if="item.badge" class="quick__badge" :aria-label="`${item.badge} 条待审核`">{{ item.badge }}</span>
-        </router-link>
-      </nav>
-    </aside>
+    <nav class="quick" aria-label="更多栏目">
+      <router-link v-for="item in extras" :key="item.to" :to="item.to" class="quick__link">
+        <klh-icon :name="item.icon" :size="18" />
+        {{ item.label }}
+        <span v-if="item.badge" class="quick__badge" :aria-label="`${item.badge} 条待审核`">{{ item.badge }}</span>
+      </router-link>
+    </nav>
   </div>
 </template>
 
@@ -102,76 +99,110 @@ export default {
 
 <style lang="scss" scoped>
 .home {
-  display: grid;
-  grid-template-columns: minmax(0, 1.6fr) minmax(340px, 1fr);
+  display: flex;
+  flex-direction: column;
   gap: 20px;
+  max-width: 1440px;
   min-height: 100vh;
+  margin: 0 auto;
   padding: clamp(16px, 2vw, 28px);
 }
 
+/* 上：科智汇主视觉，深校徽蓝底，插画在右侧淡入 */
 .hero {
   position: relative;
+  isolation: isolate;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 24px;
-  min-height: 560px;
-  padding: clamp(20px, 2.4vw, 32px) clamp(24px, 3vw, 44px);
+  flex: 1;
+  gap: 28px;
+  min-height: 380px;
+  padding: clamp(20px, 2.4vw, 32px) clamp(24px, 3.6vw, 56px);
   border-radius: 24px;
-  background-color: #f7f9fc;
-  background-size: cover;
-  background-position: right bottom;
-  box-shadow: var(--klh-shadow);
+  background: var(--klh-blue-deep);
+  color: var(--klh-white);
   overflow: hidden;
+  box-shadow: 0 24px 48px -28px rgba(13, 36, 120, 0.7);
   animation: klh-rise 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(90deg, var(--klh-blue-deep) 0%, var(--klh-blue-deep) 34%, rgba(13, 36, 120, 0.7) 60%, rgba(13, 36, 120, 0.14) 100%);
+  }
+}
+
+.hero__art {
+  position: absolute;
+  inset: 0 0 0 auto;
+  z-index: -2;
+  width: min(68%, 900px);
+  height: 100%;
+  object-fit: cover;
+  object-position: right center;
+}
+
+.hero__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
 }
 
 .hero__brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 
-  img { width: 44px; height: 44px; border-radius: 50%; }
+  img {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px var(--klh-white);
+  }
 }
-.hero__brand-zh { font-size: 30px; line-height: 1; color: var(--klh-blue-deep); }
-.hero__brand-sub {
-  padding-left: 12px;
-  border-left: 1.5px solid var(--klh-line-strong);
-  font-size: 15px;
+
+.hero__school {
+  font-size: 16px;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  color: var(--klh-blue-deep);
+  letter-spacing: 0.16em;
 }
 
 .hero__center {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: clamp(16px, 2vw, 28px);
+  gap: clamp(14px, 1.8vw, 24px);
 }
 
 .hero__title {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 28px;
 }
 
 .hero__zh {
-  font-size: clamp(72px, 9vw, 160px);
+  font-size: clamp(76px, 9vw, 148px);
   line-height: 1;
   white-space: nowrap;
   letter-spacing: 0.04em;
-  color: var(--klh-blue-deep);
-  text-shadow: 0 6px 18px rgba(20, 50, 154, 0.12);
+  color: var(--klh-white);
+  text-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
 }
 
 .hero__ai {
-  font-size: clamp(22px, 2.4vw, 34px);
+  padding: 6px 16px;
+  border-radius: 10px;
+  background: var(--klh-orange);
+  font-size: clamp(20px, 2.2vw, 30px);
   font-weight: 800;
-  letter-spacing: 0.32em;
-  padding-left: 0.32em;
-  color: var(--klh-blue);
+  letter-spacing: 0.24em;
+  line-height: 1.3;
+  color: var(--klh-white);
 }
 
 .hero__motto {
@@ -180,79 +211,67 @@ export default {
   gap: 14px;
   font-size: clamp(16px, 1.5vw, 20px);
   font-weight: 600;
-  letter-spacing: 0.14em;
-  color: var(--klh-blue-deep);
+  letter-spacing: 0.16em;
   white-space: nowrap;
 
-  .rule { width: 40px; height: 1.5px; background: currentColor; opacity: 0.5; }
+  .rule { width: 40px; height: 2px; background: var(--klh-orange); }
   .gap { display: inline-block; width: 1em; }
 }
 
 .hero__greet {
   font-size: 14px;
   letter-spacing: 0.06em;
-  color: var(--klh-muted);
+  opacity: 0.88;
 }
 
-.side {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  min-width: 0;
-}
-
-.side__top {
-  display: flex;
-  justify-content: flex-end;
-}
-
+/* 下：三大矩阵入口，实色卡片 + 白字 */
 .entries {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  gap: 16px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
 }
 
 .entry {
   --tone: var(--klh-orange);
-  --tint: #fff3e6;
+  --tone-deep: #a94f05;
+  position: relative;
   display: flex;
-  flex: 1;
   align-items: center;
-  gap: 20px;
-  min-height: 120px;
-  padding: 20px 24px;
+  gap: 18px;
+  min-height: clamp(132px, 20vh, 188px);
+  padding: 22px 24px;
   border-radius: 20px;
-  background: linear-gradient(120deg, var(--tint), var(--klh-white) 140%);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.8), var(--klh-shadow);
+  background: linear-gradient(135deg, var(--tone) 0%, var(--tone-deep) 100%);
+  color: var(--klh-white);
+  box-shadow: 0 18px 32px -22px var(--tone-deep);
   animation: klh-rise 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
   transition: transform 0.2s, box-shadow 0.2s;
 
-  &:nth-child(1) { animation-delay: 0.08s; }
-  &:nth-child(2) { animation-delay: 0.16s; }
-  &:nth-child(3) { animation-delay: 0.24s; }
+  &:nth-child(1) { animation-delay: 0.1s; }
+  &:nth-child(2) { animation-delay: 0.18s; }
+  &:nth-child(3) { animation-delay: 0.26s; }
 
   &:hover {
-    transform: translateY(-3px);
-    box-shadow: inset 0 0 0 1px var(--tone), 0 16px 32px -20px var(--tone);
+    transform: translateY(-4px);
+    box-shadow: 0 24px 40px -20px var(--tone-deep);
   }
-  &:hover .entry__arrow { background: var(--tone); color: var(--klh-white); }
+  &:hover .entry__arrow { background: var(--klh-white); color: var(--tone-deep); }
 
-  &--education { --tone: var(--klh-blue); --tint: #e9effd; }
-  &--course { --tone: var(--klh-teal); --tint: #e3f4f1; }
+  &--education { --tone: var(--klh-blue); --tone-deep: var(--klh-blue-deep); }
+  &--course { --tone: var(--klh-teal); --tone-deep: #064843; }
 }
 
 .entry__icon {
   flex-shrink: 0;
   display: grid;
   place-items: center;
-  width: 84px;
-  height: 84px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
   background: var(--klh-white);
-  box-shadow: 0 8px 20px -12px var(--tone);
+  box-shadow: 0 10px 20px -10px rgba(0, 0, 0, 0.45);
 
-  img { width: 68px; height: 68px; object-fit: contain; }
+  img { width: 64px; height: 64px; object-fit: contain; }
 }
 
 .entry__text {
@@ -264,36 +283,34 @@ export default {
 }
 
 .entry__title {
-  font-size: clamp(20px, 1.8vw, 26px);
+  font-size: clamp(19px, 1.6vw, 24px);
   font-weight: 800;
   letter-spacing: 0.04em;
-  line-height: 1.25;
-  color: var(--tone);
+  line-height: 1.3;
   text-wrap: balance;
 }
 
 .entry__sub {
-  font-size: 15px;
+  font-size: 14px;
   letter-spacing: 0.1em;
-  color: var(--klh-muted);
+  opacity: 0.92;
 }
 
 .entry__arrow {
   flex-shrink: 0;
   display: grid;
   place-items: center;
-  width: 44px;
-  height: 44px;
-  border: 1.5px solid var(--tone);
+  width: 42px;
+  height: 42px;
+  border: 2px solid var(--klh-white);
   border-radius: 50%;
-  color: var(--tone);
   transition: background 0.2s, color 0.2s;
 }
 
 .quick {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
 }
 
 .quick__link {
@@ -301,15 +318,16 @@ export default {
   align-items: center;
   gap: 6px;
   height: 40px;
-  padding: 0 16px;
+  padding: 0 18px;
   border-radius: 999px;
-  border: 1px solid var(--klh-line);
+  border: 1.5px solid var(--klh-line-strong);
   background: var(--klh-white);
   font-size: 14px;
+  font-weight: 600;
   color: var(--klh-ink);
-  transition: border-color 0.2s, color 0.2s;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
 
-  &:hover { border-color: var(--klh-blue); color: var(--klh-blue); }
+  &:hover { border-color: var(--klh-blue); background: var(--klh-blue); color: var(--klh-white); }
 }
 
 .quick__badge {
@@ -331,13 +349,13 @@ export default {
 }
 
 @media (max-width: 1080px) {
-  .home { grid-template-columns: 1fr; }
-  .hero { min-height: 440px; }
-  .hero__center { max-width: 100%; }
-  .side__top { order: -1; }
+  .entries { grid-template-columns: 1fr; gap: 14px; }
+  .entry { min-height: 108px; }
+  .hero__art { width: 100%; opacity: 0.6; }
 }
 
 @media (max-width: 560px) {
+  .hero__school { display: none; }
   .hero__motto .rule { display: none; }
   .hero__motto { white-space: normal; }
   .entry { gap: 14px; padding: 16px; }

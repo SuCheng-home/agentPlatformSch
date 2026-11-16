@@ -72,7 +72,7 @@
               <td class="w-status">
                 <el-switch
                   :value="r.status === 'published'"
-                  active-color="#1c45c4"
+                  active-color="#1638b0"
                   :aria-label="`${r.name} 上架状态`"
                   @change="(v) => toggle(r, v)"
                 />
