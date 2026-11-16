@@ -52,7 +52,7 @@
 import KlhIcon from '../components/KlhIcon.vue';
 import UserMenu from '../components/user-menu.vue';
 import logo from '../assets/logo.png';
-import heroImg from '../assets/home-hero.webp';
+import heroImg from '../assets/home-hero-ai.webp';
 import iconSubject from '../assets/icons/mx-subject.webp';
 import iconEducation from '../assets/icons/mx-education.webp';
 import iconCourse from '../assets/icons/mx-course.webp';
@@ -131,15 +131,16 @@ export default {
     position: absolute;
     inset: 0;
     z-index: -1;
-    background: linear-gradient(90deg, var(--klh-blue-deep) 0%, var(--klh-blue-deep) 34%, rgba(13, 36, 120, 0.7) 60%, rgba(13, 36, 120, 0.14) 100%);
+    background: linear-gradient(90deg, var(--klh-blue-deep) 0%, var(--klh-blue-deep) 28%, rgba(13, 36, 120, 0.35) 50%, rgba(13, 36, 120, 0) 64%);
   }
 }
 
+/* AI 主视觉：神经网络大脑 + 电路纹亭台 + 发光书本，左侧留深蓝给标题 */
 .hero__art {
   position: absolute;
   inset: 0 0 0 auto;
   z-index: -2;
-  width: min(68%, 900px);
+  width: min(82%, 1180px);
   height: 100%;
   object-fit: cover;
   object-position: right center;
