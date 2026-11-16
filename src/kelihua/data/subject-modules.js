@@ -1,34 +1,35 @@
 // 学科应用矩阵：每个学科只展示本学科的知识模块。
 // 物理五大模块来自教师说明文档「所属知识模块（声 光 力 热 电）」；信息科技按学校要求分三块。
+// 模块色避开橙（工具）与蓝（智能体），配图位于 assets/modules/<key>.webp。
 // 数学的真实资源尚未提供，模块先占位，待学校资料到位后补充。
 
 export const SUBJECT_MODULES = {
   sx: {
     ready: false,
     modules: [
-      { key: 'number', label: '数与代数' },
-      { key: 'geometry', label: '图形与几何' },
-      { key: 'statistics', label: '统计与概率' },
-      { key: 'practice', label: '综合与实践' }
+      { key: 'number', label: '数与代数', tone: 'teal' },
+      { key: 'geometry', label: '图形与几何', tone: 'forest' },
+      { key: 'statistics', label: '统计与概率', tone: 'brick' },
+      { key: 'practice', label: '综合与实践', tone: 'plum' }
     ]
   },
   wl: {
     ready: true,
     modules: [
-      { key: 'sound', label: '声' },
-      { key: 'light', label: '光' },
-      { key: 'force', label: '力' },
-      { key: 'heat', label: '热' },
-      { key: 'electricity', label: '电' }
+      { key: 'sound', label: '声', tone: 'teal' },
+      { key: 'light', label: '光', tone: 'slate' },
+      { key: 'force', label: '力', tone: 'forest' },
+      { key: 'heat', label: '热', tone: 'brick' },
+      { key: 'electricity', label: '电', tone: 'plum' }
     ],
-    common: { key: 'common', label: '全模块通用' }
+    common: { key: 'common', label: '全模块通用', tone: 'stone' }
   },
   xx: {
     ready: true,
     modules: [
-      { key: 'internet', label: '互联网' },
-      { key: 'iot', label: '物联网' },
-      { key: 'ai', label: '人工智能' }
+      { key: 'internet', label: '互联网', tone: 'teal' },
+      { key: 'iot', label: '物联网', tone: 'forest' },
+      { key: 'ai', label: '人工智能', tone: 'plum' }
     ]
   }
 };

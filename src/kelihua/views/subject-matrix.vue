@@ -1,7 +1,13 @@
 <template>
   <div class="klh-page sm">
     <header class="sm-head">
-      <h1 class="sm-title">学科应用矩阵</h1>
+      <div class="sm-head__text">
+        <h1 class="sm-title">学科应用矩阵</h1>
+        <p class="sm-legend">
+          <span class="legend legend--tool">工具</span>
+          <span class="legend legend--agent">智能体</span>
+        </p>
+      </div>
       <label class="klh-search sm-search">
         <KlhIcon name="search" :size="16" />
         <span class="sr-only">搜索资源或教师</span>
@@ -19,19 +25,23 @@
         :disabled="!item.enabled"
         :title="item.enabled ? item.label : `${item.label} · 建设中`"
         @click="setSubject(item.key)"
-      >{{ item.label }}</button>
+      >
+        {{ item.label }}
+        <small v-if="!item.enabled">建设中</small>
+      </button>
     </nav>
 
-    <nav class="sm-modules" :aria-label="`${subjectLabel(subject)}模块`">
+    <nav :class="['sm-modules', { 'is-few': blocks.length <= 3 }]" :aria-label="`${subjectLabel(subject)}模块`">
       <a
-        v-for="(block, index) in blocks"
+        v-for="block in blocks"
         :key="block.key"
         :href="`#mod-${block.key}`"
-        :class="['sm-module', `tone-${tone(index)}`]"
+        :class="['sm-module', `tone-${block.tone}`]"
         @click.prevent="jump(block.key)"
       >
+        <img v-if="art(block.key)" class="sm-module__art" :src="art(block.key)" alt="" width="480" height="262" />
         <span class="sm-module__label">{{ block.label }}</span>
-        <span class="sm-module__count">{{ block.items.length }}</span>
+        <span class="sm-module__count">{{ block.items.length }} 项资源</span>
       </a>
     </nav>
 
@@ -39,12 +49,18 @@
       v-for="block in visibleBlocks"
       :id="`mod-${block.key}`"
       :key="block.key"
-      :class="['sm-block', `tone-${tone(blocks.findIndex((item) => item.key === block.key))}`]"
+      :class="['sm-block', `tone-${block.tone}`]"
       :aria-labelledby="`mod-title-${block.key}`"
     >
-      <header class="sm-block__slab">
-        <h2 :id="`mod-title-${block.key}`" class="sm-block__title">{{ block.label }}</h2>
-        <span class="sm-block__count">{{ block.items.length }} 项</span>
+      <header class="sm-block__band">
+        <div class="sm-block__text">
+          <h2 :id="`mod-title-${block.key}`" class="sm-block__title">{{ block.label }}</h2>
+          <p class="sm-block__meta">
+            <span>{{ block.items.length }} 项资源</span>
+            <span v-if="block.items.length">工具 {{ countOf(block, 'tool') }} · 智能体 {{ countOf(block, 'agent') }}</span>
+          </p>
+        </div>
+        <img v-if="art(block.key)" class="sm-block__art" :src="art(block.key)" alt="" width="480" height="262" loading="lazy" />
       </header>
       <div v-if="block.items.length" class="sm-grid">
         <MatrixCard v-for="item in block.items" :key="item.id" :item="item" />
@@ -65,7 +81,10 @@ import MatrixCard from '../components/matrix-card.vue';
 import { SUBJECT_MODULES } from '../data/subject-modules';
 import state, { getters } from '../store';
 
-const TONES = ['blue', 'orange', 'ink', 'teal', 'deep'];
+const MODULE_ART = Object.fromEntries(
+  Object.entries(import.meta.glob('../assets/modules/*.webp', { eager: true, import: 'default' }))
+    .map(([path, url]) => [path.split('/').pop().replace('.webp', ''), url])
+);
 const DEFAULT_SUBJECT = 'wl';
 
 export default {
@@ -109,11 +128,14 @@ export default {
   },
   methods: {
     subjectLabel: getters.subjectLabel,
-    tone(index) {
-      return index < 0 ? 'plain' : TONES[index % TONES.length];
+    art(key) {
+      return MODULE_ART[key];
+    },
+    countOf(block, type) {
+      return block.items.filter((item) => item.type === type).length;
     },
     withItems(module) {
-      return { ...module, items: this.resources.filter((resource) => (resource.modules || []).includes(module.key)) };
+      return { tone: 'stone', ...module, items: this.resources.filter((resource) => (resource.modules || []).includes(module.key)) };
     },
     readQuery(subject) {
       this.subject = SUBJECT_MODULES[subject] ? subject : DEFAULT_SUBJECT;
@@ -128,26 +150,20 @@ export default {
       const el = document.getElementById(`mod-${key}`);
       if (!el) return;
       const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 80, behavior: reduce ? 'auto' : 'smooth' });
+      window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 24, behavior: reduce ? 'auto' : 'smooth' });
     }
   }
 };
 </script>
 
 <style lang="scss" scoped>
-.sm {
-  --tone: var(--klh-blue);
-  --tone-ink: var(--klh-white);
-}
-
-.tone-blue { --tone: var(--klh-blue); --tone-ink: var(--klh-white); }
-.tone-orange { --tone: var(--klh-orange); --tone-ink: var(--klh-ink); }
-.tone-ink { --tone: var(--klh-ink); --tone-ink: var(--klh-white); }
-.tone-teal { --tone: var(--klh-teal); --tone-ink: var(--klh-white); }
-.tone-deep { --tone: var(--klh-blue-deep); --tone-ink: var(--klh-white); }
-.tone-plain { --tone: var(--klh-white); --tone-ink: var(--klh-ink); }
-.tone-plain .sm-block__slab { box-shadow: inset 0 0 0 3px var(--klh-ink); }
-.tone-plain .sm-block__title { font-size: 22px; }
+/* 模块色：刻意避开橙（工具）与蓝（智能体），资源类型的颜色只出现在卡片上 */
+.tone-teal { --tone: #0e7c76; --tint: #e4f3f1; }
+.tone-forest { --tone: #3b7a3f; --tint: #e9f2e6; }
+.tone-brick { --tone: #a83a3a; --tint: #f8e9e7; }
+.tone-plum { --tone: #7d3c6b; --tint: #f4e9f1; }
+.tone-slate { --tone: #3d4a66; --tint: #eaedf3; }
+.tone-stone { --tone: #5c564f; --tint: #efece7; }
 
 .sm-head {
   display: flex;
@@ -155,6 +171,13 @@ export default {
   justify-content: space-between;
   gap: 20px;
   padding-bottom: 20px;
+}
+
+.sm-head__text {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 12px 20px;
 }
 
 .sm-title {
@@ -165,30 +188,64 @@ export default {
   color: var(--klh-ink);
 }
 
-.sm-search { border-radius: 2px; border-width: 2px; border-color: var(--klh-ink); }
+.sm-legend {
+  display: flex;
+  gap: 14px;
+  font-size: 14px;
+  color: var(--klh-muted);
+}
+
+.legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  &::before {
+    content: '';
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    background: var(--c);
+  }
+  &--tool { --c: var(--klh-orange); }
+  &--agent { --c: var(--klh-blue); }
+}
+
+.sm-search { border-radius: 999px; }
 
 .sm-subjects {
   display: flex;
-  gap: 0;
+  gap: 6px;
+  padding: 6px;
+  width: max-content;
+  max-width: 100%;
   overflow-x: auto;
-  border-top: 3px solid var(--klh-ink);
-  border-bottom: 1px solid var(--klh-line-strong);
+  border-radius: 999px;
+  background: var(--klh-white);
+  box-shadow: inset 0 0 0 1px var(--klh-line);
   scrollbar-width: none;
   &::-webkit-scrollbar { display: none; }
 }
 
 .sm-subject {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   flex-shrink: 0;
-  padding: 14px 20px;
+  height: 40px;
+  padding: 0 20px;
   border: 0;
+  border-radius: 999px;
   background: transparent;
   color: var(--klh-ink);
   font: inherit;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
   letter-spacing: 0.04em;
   cursor: pointer;
   transition: background 0.18s, color 0.18s;
+
+  small { font-size: 11px; font-weight: 400; letter-spacing: 0; }
 
   &:hover:not(:disabled):not(.is-active) { background: var(--klh-ink-tint); }
   &.is-active { background: var(--klh-ink); color: var(--klh-white); }
@@ -197,27 +254,52 @@ export default {
 
 .sm-modules {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
   margin-top: 24px;
+
+  &.is-few { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
 }
 
 .sm-module {
+  position: relative;
   display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 8px;
-  min-height: 108px;
-  padding: 16px 18px;
-  background: var(--tone);
-  color: var(--tone-ink);
-  transition: transform 0.2s;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 4px;
+  min-height: 168px;
+  padding: 18px 20px;
+  border-radius: 18px;
+  background: var(--tint);
+  color: var(--tone);
+  overflow: hidden;
+  isolation: isolate;
+  transition: transform 0.2s, box-shadow 0.2s;
 
-  &:hover { transform: translateY(-3px); }
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 28px -20px var(--tone);
+  }
+  &:hover .sm-module__art { transform: scale(1.06) translateY(-2px); }
+}
+
+/* 配图为白底 3D 插画，正片叠底后融进模块色块 */
+.sm-module__art {
+  position: absolute;
+  top: -6px;
+  right: -28px;
+  z-index: -1;
+  width: 78%;
+  height: auto;
+  mix-blend-mode: multiply;
+  filter: brightness(1.07);
+  -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 55%, transparent 100%);
+  mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 55%, transparent 100%);
+  transition: transform 0.35s;
 }
 
 .sm-module__label {
-  font-size: 28px;
+  font-size: 30px;
   font-weight: 900;
   line-height: 1.1;
   letter-spacing: 0.04em;
@@ -225,45 +307,75 @@ export default {
 }
 
 .sm-module__count {
-  font-size: 28px;
-  font-weight: 300;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  opacity: 0.8;
 }
 
 .sm-block {
-  display: grid;
-  grid-template-columns: 160px minmax(0, 1fr);
-  gap: 24px;
-  margin-top: 40px;
-  scroll-margin-top: 80px;
+  margin-top: 44px;
+  scroll-margin-top: 24px;
 }
 
-.sm-block__slab {
-  position: sticky;
-  top: 88px;
+.sm-block__band {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 112px;
+  margin-bottom: 20px;
+  padding: 0 0 0 28px;
+  border-radius: 18px;
+  background: var(--tint);
+  color: var(--tone);
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 8px;
+    background: var(--tone);
+  }
+}
+
+.sm-block__text {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  align-self: start;
-  min-height: 160px;
-  padding: 18px;
-  background: var(--tone);
-  color: var(--tone-ink);
+  gap: 6px;
+  padding: 18px 0;
 }
 
 .sm-block__title {
-  font-size: 44px;
+  font-size: 34px;
   font-weight: 900;
   line-height: 1.1;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.04em;
   text-wrap: balance;
 }
 
-.sm-block__count {
+.sm-block__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
   font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  font-weight: 600;
+  color: var(--klh-muted);
+}
+
+.sm-block__art {
+  align-self: stretch;
+  width: auto;
+  height: 112px;
+  object-fit: cover;
+  mix-blend-mode: multiply;
+  filter: brightness(1.07);
+  -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 50%, transparent 100%);
+  mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 50%, transparent 100%);
 }
 
 .sm-grid {
@@ -277,7 +389,8 @@ export default {
   align-items: center;
   justify-content: center;
   gap: 10px;
-  min-height: 160px;
+  min-height: 140px;
+  border-radius: 18px;
   border: 2px dashed var(--klh-line-strong);
   color: var(--klh-muted);
   font-size: 15px;
@@ -286,14 +399,15 @@ export default {
 @media (max-width: 760px) {
   .sm-head { align-items: stretch; flex-direction: column; }
   .sm-search { width: 100%; }
-  .sm-module { min-height: 84px; }
-  .sm-module__label, .sm-module__count { font-size: 22px; }
-  .sm-block { grid-template-columns: 1fr; gap: 14px; margin-top: 32px; }
-  .sm-block__slab { position: static; flex-direction: row; align-items: center; min-height: 0; padding: 12px 16px; }
-  .sm-block__title { font-size: 28px; }
+  .sm-modules, .sm-modules.is-few { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .sm-module { min-height: 128px; padding: 14px; }
+  .sm-module__label { font-size: 22px; }
+  .sm-block { margin-top: 32px; }
+  .sm-block__title { font-size: 26px; }
+  .sm-block__art { height: 96px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sm-module { transition: none; }
+  .sm-module, .sm-module__art { transition: none; }
 }
 </style>

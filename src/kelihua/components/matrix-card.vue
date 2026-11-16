@@ -61,24 +61,26 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+/* 资源类型色：橙 = 工具，蓝 = 智能体（全平台统一约定） */
 .mcard {
   --accent: var(--klh-orange);
+  --accent-tint: var(--klh-orange-tint);
   position: relative;
   display: flex;
   flex-direction: column;
-  border: 2px solid var(--accent);
-  border-radius: 4px;
+  border-radius: 16px;
   background: var(--klh-white);
+  box-shadow: 0 0 0 1px var(--klh-line), var(--klh-shadow);
   overflow: hidden;
   transition: transform 0.2s, box-shadow 0.2s;
 
   &:hover {
     transform: translateY(-3px);
-    box-shadow: 0 14px 28px -18px var(--accent);
+    box-shadow: 0 0 0 1.5px var(--accent), 0 18px 32px -22px var(--accent);
   }
   &:hover img { transform: scale(1.03); }
 
-  &--agent { --accent: var(--klh-blue); }
+  &--agent { --accent: var(--klh-blue); --accent-tint: var(--klh-blue-tint); }
 }
 
 .mcard__hit {
@@ -94,7 +96,6 @@ export default {
   position: relative;
   aspect-ratio: 16 / 10;
   overflow: hidden;
-  border-bottom: 2px solid var(--accent);
   background: var(--klh-paper);
 
   img {
@@ -105,26 +106,50 @@ export default {
     object-position: top;
     transition: transform 0.4s;
   }
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 3px;
+    background: var(--accent);
+  }
 }
 
 .mcard__cover {
   display: grid;
   place-items: center;
   height: 100%;
-  background: var(--accent);
-  color: var(--klh-white);
+  background: var(--accent-tint);
+  color: var(--accent);
 }
 
 .mcard__type {
   position: absolute;
-  top: 0;
-  left: 0;
-  padding: 4px 10px;
-  background: var(--accent);
-  color: var(--klh-white);
+  top: 10px;
+  left: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: var(--klh-white);
+  box-shadow: 0 2px 8px rgba(23, 32, 58, 0.12);
+  color: var(--accent);
   font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
+
+  &::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
 }
 
 .mcard__body {
@@ -171,7 +196,7 @@ export default {
   height: 32px;
   padding: 0 14px;
   border: 0;
-  border-radius: 2px;
+  border-radius: 999px;
   background: var(--accent);
   color: var(--klh-white);
   font: inherit;
@@ -182,9 +207,8 @@ export default {
   &:hover { filter: brightness(0.92); }
 
   &--ghost {
-    background: transparent;
+    background: var(--accent-tint);
     color: var(--accent);
-    box-shadow: inset 0 0 0 1.5px var(--accent);
   }
 }
 

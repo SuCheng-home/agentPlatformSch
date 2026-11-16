@@ -145,7 +145,7 @@ export default {
 
 .edu__domains {
   position: sticky;
-  top: 88px;
+  top: 24px;
   display: flex;
   flex-direction: column;
   gap: 2px;

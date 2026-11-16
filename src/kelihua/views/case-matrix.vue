@@ -215,7 +215,7 @@ export default {
 
 .case__catalog {
   position: sticky;
-  top: 88px;
+  top: 24px;
   display: flex;
   flex-direction: column;
   gap: 4px;

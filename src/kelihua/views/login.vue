@@ -298,8 +298,6 @@ export default {
 
 .hero__name {
   padding-left: clamp(4px, 1vw, 16px);
-  opacity: 0;
-  animation: klh-fade-up 0.8s 4.9s ease-out forwards;
 
   h1 {
     display: flex;
