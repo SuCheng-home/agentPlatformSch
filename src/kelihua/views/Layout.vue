@@ -1,5 +1,5 @@
 <template>
-  <div :class="['klh klh-shell', { 'is-bare': bare }]">
+  <div :class="['klh klh-shell', { 'is-bare': bare, 'is-white': whitePage }]">
     <!-- 首页不显示导航；其余页面只在顶部保留三大矩阵切换 -->
     <header v-if="!bare" class="klh-top">
       <router-link to="/kelihua/home" class="top-brand" aria-label="返回科智汇首页">
@@ -54,6 +54,7 @@ export default {
   },
   computed: {
     bare() { return this.$route.path === '/kelihua/home'; },
+    whitePage() { return this.$route.path === '/kelihua/subject'; },
     isWorkflow() { return ['/kelihua/build', '/kelihua/review'].includes(this.$route.path); },
     activeIndex() {
       const resource = this.$route.path.startsWith('/kelihua/resource/') && getters.findById(this.$route.params.id);
@@ -122,6 +123,8 @@ export default {
   --klh-shadow: 0 1px 2px rgba(40, 49, 73, 0.04), 0 8px 24px -14px rgba(40, 49, 73, 0.16);
   background: var(--klh-paper);
 }
+
+.klh-shell.is-white { background: var(--klh-white); }
 
 .workflow-notice { margin: 20px auto 0; padding: 12px 20px; max-width: 1340px; color: #8f551f; background: var(--klh-orange-tint); font-size: 13px; }
 

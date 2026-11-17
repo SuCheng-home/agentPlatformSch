@@ -48,11 +48,12 @@
       :class="['sm-block', `tone-${block.tone}`]"
       :aria-labelledby="`mod-title-${block.key}`"
     >
-      <header class="sm-block__band">
-        <div class="sm-block__text">
-          <h2 :id="`mod-title-${block.key}`" class="sm-block__title">{{ block.label }}</h2>
-        </div>
-        <img v-if="art(block.key)" class="sm-block__art" :src="art(block.key)" alt="" width="480" height="262" loading="lazy" />
+      <header class="sm-block__head">
+        <span v-if="art(block.key)" class="sm-block__badge" aria-hidden="true">
+          <img :src="art(block.key)" alt="" width="480" height="262" loading="lazy" />
+        </span>
+        <h2 :id="`mod-title-${block.key}`" class="sm-block__title">{{ block.label }}</h2>
+        <span class="sm-block__count">{{ block.items.length ? `${block.items.length} 项资源` : '整理中' }}</span>
       </header>
       <div v-if="block.items.length" class="sm-grid">
         <MatrixCard v-for="item in block.items" :key="item.id" :item="item" />
@@ -211,8 +212,7 @@ export default {
   display: flex;
   gap: 6px;
   padding: 6px;
-  width: max-content;
-  max-width: 100%;
+  width: 100%;
   overflow-x: auto;
   border-radius: 999px;
   background: var(--klh-white);
@@ -224,10 +224,11 @@ export default {
 .sm-subject {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
-  flex-shrink: 0;
+  flex: 1 0 auto;
   height: 40px;
-  padding: 0 20px;
+  padding: 0 16px;
   border: 0;
   border-radius: 999px;
   background: transparent;
@@ -298,62 +299,75 @@ export default {
 }
 
 .sm-block {
-  margin-top: 44px;
+  margin-top: 56px;
   scroll-margin-top: 24px;
 }
 
-.sm-block__band {
-  position: relative;
+/* 单元标题：插画徽标 + 标题 + 数量，右侧细线延伸到内容边缘 */
+.sm-block__head {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  min-height: 112px;
+  gap: 14px;
   margin-bottom: 20px;
-  padding: 0 0 0 28px;
-  border-radius: 18px;
-  background: var(--tint);
   color: var(--tone);
-  overflow: hidden;
 
-  &::before {
+  &::after {
     content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 8px;
-    background: var(--tone);
+    flex: 1;
+    height: 1px;
+    margin-left: 8px;
+    background: var(--klh-line-strong);
   }
 }
 
-.sm-block__text {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 18px 0;
+.sm-block__badge {
+  display: block;
+  flex-shrink: 0;
+  width: 88px;
+  height: 52px;
+  border-radius: 14px;
+  background: var(--tint);
+  overflow: hidden;
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    mix-blend-mode: multiply;
+    filter: brightness(1.07);
+  }
 }
 
 .sm-block__title {
-  font-size: 34px;
+  font-size: 28px;
   font-weight: 900;
   line-height: 1.1;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   text-wrap: balance;
 }
 
-.sm-placeholder--subject { margin-top: 24px; min-height: 240px; }
-
-.sm-block__art {
-  align-self: stretch;
-  width: auto;
-  height: 112px;
-  object-fit: cover;
-  mix-blend-mode: multiply;
-  filter: brightness(1.07);
-  -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 50%, transparent 100%);
-  mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 50%, transparent 100%);
+.sm-block__count {
+  flex-shrink: 0;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: var(--tint);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 26px;
+  letter-spacing: 0.04em;
 }
+
+.sm-block .sm-placeholder {
+  min-height: 96px;
+  border: 0;
+  background: var(--tint);
+  color: var(--tone);
+  opacity: 0.8;
+}
+
+.sm-placeholder--subject { margin-top: 24px; min-height: 240px; }
 
 .sm-grid {
   display: grid;
@@ -380,8 +394,8 @@ export default {
   .sm-module { min-height: 128px; padding: 14px; }
   .sm-module__label { font-size: 22px; }
   .sm-block { margin-top: 32px; }
-  .sm-block__title { font-size: 26px; }
-  .sm-block__art { height: 96px; }
+  .sm-block__title { font-size: 24px; }
+  .sm-block__badge { width: 68px; height: 40px; border-radius: 12px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
