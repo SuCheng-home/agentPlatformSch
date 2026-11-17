@@ -118,7 +118,7 @@ export default {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     },
     view(s) {
-      actions.openResource(s.publishedId);
+      this.$router.push(`/kelihua/resource/${s.publishedId}`);
     },
     onSubmit(payload) {
       if (this.editing) {

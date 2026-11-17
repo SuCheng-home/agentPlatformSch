@@ -48,57 +48,45 @@
         >
           <small>{{ subjectLabel(u.subject) }} · {{ u.order }}</small>
           <strong>{{ u.title }}</strong>
-          <span>{{ u.lessons.length }} 个课时 · 原文涉及 AI {{ u.lessons.filter((l) => l.ai).length }}</span>
+          <span>{{ u.lessons.length }} 个课时</span>
         </button>
       </nav>
 
       <section v-if="active" class="case__detail" aria-live="polite">
-        <header class="unit-hero">
-          <p class="unit-hero__crumb">{{ active.order }} · {{ subjectLabel(active.subject) }}</p>
-          <h2 class="unit-hero__title">{{ active.title }}</h2>
-          <p class="unit-hero__idea"><span>归档说明</span>{{ active.bigIdea }}</p>
-          <div class="unit-hero__task">
-            <span class="unit-hero__task-tag">资料入口</span>
-            <p>{{ active.task }}</p>
-          </div>
-          <p class="unit-hero__by">课例教师：{{ active.designer }}</p>
-        </header>
-
         <div class="lessons-head">
-          <h3>学程课时</h3>
-          <span>共 {{ active.lessons.length }} 课时 · 按资料归档</span>
+          <h2>{{ active.title }} · 单元课时资源</h2>
+          <span>共 {{ active.lessons.length }} 课时 · 按单元进程上课</span>
         </div>
 
         <ol class="lessons">
-          <li v-for="(l, i) in active.lessons" :key="i" :class="['lesson', { 'lesson--ai': l.ai }]">
+          <li v-for="(l, i) in active.lessons" :key="l.id" class="lesson">
             <div class="lesson__no" aria-hidden="true">
               <small>课时</small>
               <strong>{{ String(i + 1).padStart(2, '0') }}</strong>
             </div>
             <div class="lesson__body">
-              <h4 class="lesson__title">
+              <h3 class="lesson__title">
                 <span class="sr-only">课时 {{ i + 1 }}：</span>{{ l.title }}
                 <span v-if="l.featured" class="tag tag--featured">
                   <klh-icon name="award" :size="12" :stroke="2.2" />精品课
                 </span>
                 <span v-if="l.ai" class="tag tag--ai">
-                  <klh-icon name="sparkle" :size="12" :stroke="2.2" />原文涉及 AI
+                  <klh-icon name="sparkle" :size="12" :stroke="2.2" />AI 赋能
                 </span>
-              </h4>
-              <p class="lesson__teacher">{{ l.teacher }} · {{ l.grade }} · {{ l.format }} 原件</p>
+              </h3>
               <p class="lesson__goal">{{ l.goal }}</p>
-              <ul class="lesson__res" aria-label="课时资源">
-                <li v-for="k in l.kinds" :key="k">
-                  <span class="res">
-                    <klh-icon :name="kindIcon(k)" :size="15" />{{ k }}
-                  </span>
-                </li>
-              </ul>
+              <div class="lesson__foot">
+                <ul class="lesson__res" aria-label="课时资源">
+                  <li v-for="k in LESSON_KINDS" :key="k.label">
+                    <span class="res"><klh-icon :name="k.icon" :size="15" />{{ k.label }}</span>
+                  </li>
+                </ul>
+                <router-link :to="`/kelihua/lesson/${l.id}`" class="lesson__enter">
+                  进入本课
+                  <klh-icon name="arrowRight" :size="14" :stroke="2.2" />
+                </router-link>
+              </div>
             </div>
-            <router-link :to="`/kelihua/lesson/${l.id}`" class="klh-btn klh-btn--sm lesson__enter">
-              进入本课
-              <klh-icon name="arrowRight" :size="14" />
-            </router-link>
           </li>
         </ol>
       </section>
@@ -114,13 +102,18 @@
 import KlhIcon from '../components/KlhIcon.vue';
 import state, { getters } from '../store';
 
-const KIND_ICON = { 原始课例: 'file', 'AI 课件': 'monitor', 教学设计: 'file', 任务单: 'clipboard', 微课: 'video', 评价量表: 'award' };
+const LESSON_KINDS = [
+  { label: 'AI 课件', icon: 'monitor' },
+  { label: '教学设计', icon: 'file' },
+  { label: '任务单', icon: 'clipboard' },
+  { label: '智能体', icon: 'bot' }
+];
 
 export default {
   name: 'KlhCaseMatrix',
   components: { KlhIcon },
   data() {
-    return { state, subject: 'all', grade: '全部', activeId: null };
+    return { state, LESSON_KINDS, subject: 'all', grade: '全部', activeId: null };
   },
   computed: {
     subjectOptions() {
@@ -145,9 +138,6 @@ export default {
   },
   methods: {
     subjectLabel: getters.subjectLabel,
-    kindIcon(k) {
-      return KIND_ICON[k] || 'file';
-    },
     setSubject(k) {
       this.subject = k;
       this.activeId = null;
@@ -161,7 +151,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.lesson__teacher { margin-top: 8px; font-size: 13px; color: var(--klh-blue); }
 .cfilter {
   display: flex;
   flex-direction: column;
@@ -255,222 +244,155 @@ export default {
   }
 }
 
-.unit-hero {
-  position: relative;
-  padding: 26px 28px;
-  border-radius: 18px;
-  background: var(--klh-white);
-  border: 1px solid var(--klh-line);
-  overflow: hidden;
-}
-
-.unit-hero__crumb {
-  font-size: 13px;
-  color: var(--klh-muted);
-}
-
-.unit-hero__title {
-  margin-top: 6px;
-  font-size: 32px;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-}
-
-.unit-hero__idea {
-  margin-top: 10px;
-  font-size: 15px;
-  color: var(--klh-ink);
-
-  span {
-    margin-right: 10px;
-    padding: 2px 8px;
-    border-radius: 6px;
-    background: var(--klh-ink-tint);
-    font-size: 12px;
-    font-weight: 700;
-    vertical-align: 1px;
-  }
-}
-
-.unit-hero__task {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-top: 18px;
-  padding: 16px 18px;
-  border-radius: 12px;
-  background: var(--klh-orange-tint);
-
-  p { font-size: 15px; font-weight: 600; }
-}
-
-.unit-hero__task-tag {
-  flex-shrink: 0;
-  font-size: 13px;
-  font-weight: 800;
-  color: #b85a08;
-}
-
-.unit-hero__by {
-  margin-top: 14px;
-  font-size: 12px;
-  color: var(--klh-faint);
-}
-
 .lessons-head {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  margin: 28px 0 14px;
+  gap: 12px;
+  margin: 0 0 16px;
 
-  h3 {
+  h2 {
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 800;
-    &::before { content: ''; width: 4px; height: 18px; border-radius: 2px; background: var(--klh-blue); }
+    &::before { content: ''; flex-shrink: 0; width: 4px; height: 20px; border-radius: 2px; background: var(--klh-blue); }
   }
-  span { font-size: 13px; color: var(--klh-muted); }
+  span { flex-shrink: 0; font-size: 13px; color: var(--klh-muted); }
 }
 
-/* 课时按学程串成一条纵线 */
 .lessons {
-  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
   list-style: none;
   padding: 0;
-
-  &::before {
-    content: '';
-    position: absolute;
-    left: 39px;
-    top: 24px;
-    bottom: 24px;
-    width: 2px;
-    background: repeating-linear-gradient(var(--klh-line-strong) 0 6px, transparent 6px 12px);
-  }
 }
 
 .lesson {
-  position: relative;
   display: grid;
-  grid-template-columns: 80px minmax(0, 1fr) auto;
-  gap: 18px;
+  grid-template-columns: 76px minmax(0, 1fr);
+  gap: 22px;
   align-items: start;
-  padding: 18px 20px 18px 0;
-  border-radius: 16px;
+  padding: 22px 24px;
+  border-radius: 18px;
   background: var(--klh-white);
   border: 1px solid var(--klh-line);
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
 
-  &:hover { border-color: var(--klh-line-strong); box-shadow: var(--klh-shadow); }
+  &:hover { border-color: var(--klh-blue-tint-2); box-shadow: var(--klh-shadow); transform: translateY(-2px); }
 }
 
 .lesson__no {
-  position: relative;
-  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-self: center;
-  width: 58px;
-  padding: 6px 0;
-  border-radius: 12px;
-  background: var(--klh-paper);
-  border: 1px solid var(--klh-line);
+  justify-content: center;
+  gap: 2px;
+  width: 76px;
+  height: 76px;
+  border-radius: 16px;
+  background: var(--klh-blue-tint);
+  color: var(--klh-blue);
 
-  small { font-size: 11px; color: var(--klh-muted); }
-  strong { font-size: 24px; font-weight: 800; line-height: 1.1; font-variant-numeric: tabular-nums; color: var(--klh-ink); }
-
-  .lesson--ai & {
-    background: var(--klh-blue-tint);
-    border-color: var(--klh-blue-tint-2);
-    small { color: var(--klh-blue); opacity: 0.8; }
-    strong { color: var(--klh-blue); }
-  }
+  small { font-size: 12px; opacity: 0.85; }
+  strong { font-size: 28px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
 }
+
+.lesson__body { min-width: 0; }
 
 .lesson__title {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 8px;
-  font-size: 17px;
-  font-weight: 700;
+  gap: 8px 10px;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.4;
 }
 
 .tag {
   display: inline-flex;
   align-items: center;
   gap: 3px;
-  height: 22px;
-  padding: 0 8px;
+  height: 24px;
+  padding: 0 9px;
   border-radius: 6px;
   font-size: 12px;
   font-weight: 700;
 
-  &--ai { background: var(--klh-blue-tint); color: var(--klh-blue); }
+  &--ai { background: var(--klh-blue); color: var(--klh-white); }
   &--featured { background: var(--klh-orange-tint); color: #b85a08; }
 }
 
 .lesson__goal {
-  margin-top: 4px;
+  display: -webkit-box;
+  margin-top: 8px;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
   font-size: 14px;
+  line-height: 1.7;
   color: var(--klh-muted);
+}
+
+.lesson__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  margin-top: 16px;
 }
 
 .lesson__res {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px 16px;
-  margin-top: 12px;
+  gap: 8px 22px;
   list-style: none;
+  padding: 0;
 }
 
 .res {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  font-size: 13px;
-  color: var(--klh-ink);
-  opacity: 0.8;
-
-  &--agent {
-    padding: 3px 10px;
-    border-radius: 999px;
-    border: 1px solid rgba(28, 69, 196, 0.25);
-    background: var(--klh-blue-tint);
-    color: var(--klh-blue);
-    font: inherit;
-    font-size: 13px;
-    font-weight: 600;
-    opacity: 1;
-    cursor: pointer;
-    &:hover { background: var(--klh-blue-tint-2); }
-  }
+  gap: 6px;
+  font-size: 14px;
+  color: var(--klh-muted);
+  .klh-icon { color: var(--klh-blue); }
 }
 
 .lesson__enter {
-  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 38px;
+  padding: 0 18px;
+  border-radius: 10px;
+  border: 1.5px solid var(--klh-blue-tint-2);
+  color: var(--klh-blue);
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+
+  &:hover { background: var(--klh-blue); border-color: var(--klh-blue); color: var(--klh-white); }
 }
 
 @media (max-width: 1000px) {
   .case { grid-template-columns: 1fr; }
-  .case__catalog { position: static; }
+  .case__catalog { position: static; max-height: none; }
 }
 
 @media (max-width: 640px) {
-  .lesson {
-    grid-template-columns: 64px minmax(0, 1fr);
-    padding-right: 14px;
-  }
-  .lessons::before { left: 31px; }
-  .lesson__enter { grid-column: 2; justify-self: start; }
-  .unit-hero { padding: 20px; }
-  .unit-hero__title { font-size: 26px; }
-  .unit-hero__task { flex-direction: column; align-items: flex-start; gap: 4px; }
+  .lesson { grid-template-columns: 1fr; gap: 14px; padding: 18px; }
+  .lesson__no { flex-direction: row; width: auto; height: auto; padding: 6px 12px; justify-self: start; gap: 6px; }
+  .lesson__no strong { font-size: 18px; }
+  .lessons-head { flex-direction: column; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lesson { transition: none; }
 }
 </style>

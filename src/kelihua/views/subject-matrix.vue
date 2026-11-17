@@ -22,12 +22,9 @@
         type="button"
         :class="['sm-subject', { 'is-active': subject === item.key }]"
         :aria-current="subject === item.key ? 'page' : null"
-        :disabled="!item.enabled"
-        :title="item.enabled ? item.label : `${item.label} · 建设中`"
         @click="setSubject(item.key)"
       >
         {{ item.label }}
-        <small v-if="!item.enabled">建设中</small>
       </button>
     </nav>
 
@@ -41,7 +38,6 @@
       >
         <img v-if="art(block.key)" class="sm-module__art" :src="art(block.key)" alt="" width="480" height="262" />
         <span class="sm-module__label">{{ block.label }}</span>
-        <span class="sm-module__count">{{ block.items.length }} 项资源</span>
       </a>
     </nav>
 
@@ -55,10 +51,6 @@
       <header class="sm-block__band">
         <div class="sm-block__text">
           <h2 :id="`mod-title-${block.key}`" class="sm-block__title">{{ block.label }}</h2>
-          <p class="sm-block__meta">
-            <span>{{ block.items.length }} 项资源</span>
-            <span v-if="block.items.length">工具 {{ countOf(block, 'tool') }} · 智能体 {{ countOf(block, 'agent') }}</span>
-          </p>
         </div>
         <img v-if="art(block.key)" class="sm-block__art" :src="art(block.key)" alt="" width="480" height="262" loading="lazy" />
       </header>
@@ -70,6 +62,11 @@
         <span>{{ ready ? '本模块资源整理中' : '真实资源整理中，即将上线' }}</span>
       </div>
     </section>
+
+    <div v-if="!keyword && !visibleBlocks.length" class="sm-placeholder sm-placeholder--subject">
+      <KlhIcon name="layers" :size="22" />
+      <span>{{ subjectLabel(subject) }}学科资源整理中，敬请期待</span>
+    </div>
 
     <div v-if="keyword && !visibleBlocks.length" class="klh-empty">没有找到「{{ keyword }}」相关的资源。</div>
   </div>
@@ -95,9 +92,9 @@ export default {
   },
   computed: {
     subjectTabs() {
-      const enabled = state.subjects.filter((item) => SUBJECT_MODULES[item.key]);
+      const configured = state.subjects.filter((item) => SUBJECT_MODULES[item.key]);
       const others = state.subjects.filter((item) => !SUBJECT_MODULES[item.key]);
-      return [...enabled.map((item) => ({ ...item, enabled: true })), ...others.map((item) => ({ ...item, enabled: false }))];
+      return [...configured, ...others];
     },
     config() {
       return SUBJECT_MODULES[this.subject] || { ready: false, modules: [] };
@@ -131,14 +128,11 @@ export default {
     art(key) {
       return MODULE_ART[key];
     },
-    countOf(block, type) {
-      return block.items.filter((item) => item.type === type).length;
-    },
     withItems(module) {
       return { tone: 'stone', ...module, items: this.resources.filter((resource) => (resource.modules || []).includes(module.key)) };
     },
     readQuery(subject) {
-      this.subject = SUBJECT_MODULES[subject] ? subject : DEFAULT_SUBJECT;
+      this.subject = state.subjects.some((item) => item.key === subject) ? subject : DEFAULT_SUBJECT;
     },
     setSubject(subject) {
       if (subject === this.subject) return;
@@ -245,11 +239,8 @@ export default {
   cursor: pointer;
   transition: background 0.18s, color 0.18s;
 
-  small { font-size: 11px; font-weight: 400; letter-spacing: 0; }
-
-  &:hover:not(:disabled):not(.is-active) { background: var(--klh-ink-tint); }
+  &:hover:not(.is-active) { background: var(--klh-ink-tint); }
   &.is-active { background: var(--klh-blue-tint); color: var(--klh-blue); }
-  &:disabled { color: var(--klh-faint); font-weight: 400; cursor: not-allowed; }
 }
 
 .sm-modules {
@@ -306,13 +297,6 @@ export default {
   text-wrap: balance;
 }
 
-.sm-module__count {
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  opacity: 0.8;
-}
-
 .sm-block {
   margin-top: 44px;
   scroll-margin-top: 24px;
@@ -358,14 +342,7 @@ export default {
   text-wrap: balance;
 }
 
-.sm-block__meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px 16px;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--klh-muted);
-}
+.sm-placeholder--subject { margin-top: 24px; min-height: 240px; }
 
 .sm-block__art {
   align-self: stretch;

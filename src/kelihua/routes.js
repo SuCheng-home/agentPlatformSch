@@ -7,6 +7,7 @@ const Layout = () => import('./views/Layout.vue');
 const Home = () => import('./views/home.vue');
 const SubjectMatrix = () => import('./views/subject-matrix.vue');
 const LessonDetail = () => import('./views/lesson-detail.vue');
+const ResourceDetail = () => import('./views/resource-detail.vue');
 const EducationMatrix = () => import('./views/EducationMatrix.vue');
 const CaseMatrix = () => import('./views/case-matrix.vue');
 const PromptLibrary = () => import('./views/PromptLibrary.vue');
@@ -59,6 +60,7 @@ export default [
       page('home', Home, '首页'),
       page('subject', SubjectMatrix, '学科应用矩阵'),
       page('lesson/:id', LessonDetail, '课时详情'),
+      page('resource/:id', ResourceDetail, '资源详情'),
       page('education', EducationMatrix, '育人管理矩阵'),
       page('course', CaseMatrix, '学程案例矩阵'),
       page('prompts', PromptLibrary, '提示词库'),

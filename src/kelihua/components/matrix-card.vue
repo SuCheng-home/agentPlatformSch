@@ -27,7 +27,6 @@
 
 <script>
 import KlhIcon from './KlhIcon.vue';
-import { actions } from '../store';
 import { copyText } from './prompt-block.vue';
 import { assetUrl, copyContent, resourceUrl } from '../utils/resources';
 
@@ -46,7 +45,7 @@ export default {
   },
   methods: {
     open() {
-      actions.openResource(this.item.id);
+      this.$router.push(`/kelihua/resource/${this.item.id}`);
     },
     async copy() {
       try {

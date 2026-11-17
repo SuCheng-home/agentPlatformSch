@@ -1,44 +1,126 @@
 <template>
-  <main class="klh-page lesson-page">
-    <router-link to="/kelihua/course" class="klh-btn klh-btn--sm">返回学程案例矩阵</router-link>
-    <div v-if="!found" class="klh-empty">未找到该课例，请从学程案例矩阵重新选择。</div>
+  <main class="klh-page dp">
+    <div v-if="!found" class="klh-empty">
+      未找到该课例，请从学程案例矩阵重新选择。
+      <router-link to="/kelihua/course" class="klh-btn klh-btn--sm">返回学程案例矩阵</router-link>
+    </div>
     <template v-else>
-      <header class="lesson-head">
-        <p class="lesson-eyebrow">真实课例 · {{ subjectLabel(lesson.subject) }} · {{ lesson.grade }}</p>
-        <h1 class="lesson-title">{{ lesson.title }}</h1>
-        <p class="lesson-meta">{{ lesson.school }} · 执教：{{ lesson.teacher }} · {{ unit.title }}</p>
-        <p v-if="lesson.metadataNote" class="lesson-notice">{{ lesson.metadataNote }}</p>
-      </header>
-      <div class="lesson-layout">
-        <section class="document-panel klh-panel">
-          <header class="document-header">
-            <div>
-              <h2 class="section-title">原始课例 · {{ lesson.format }}</h2>
-              <p class="lesson-meta">{{ lesson.sourceName }}</p>
-            </div>
-            <a :href="url" :download="lesson.sourceName" class="klh-btn klh-btn--primary">下载原文件</a>
-          </header>
-          <div class="document-text">
-            <h2 class="section-title">课例内容</h2>
-            <p class="lesson-meta">以下为原文件文本提取，图表及完整排版请查看原文件。</p>
-            <pre class="source-text">{{ lesson.sourceText }}</pre>
+      <div class="dp-top">
+        <nav class="dp-crumb" aria-label="当前位置">
+          <router-link to="/kelihua/home">首页</router-link>
+          <klh-icon name="chevronRight" :size="14" />
+          <router-link to="/kelihua/course">AI 赋能学程案例矩阵</router-link>
+          <klh-icon name="chevronRight" :size="14" />
+          <span>{{ unit.title }}</span>
+          <klh-icon name="chevronRight" :size="14" />
+          <span aria-current="page">{{ lesson.title }}</span>
+        </nav>
+        <button type="button" class="dp-back" @click="back">
+          <klh-icon name="chevronLeft" :size="16" />返回
+        </button>
+      </div>
+
+      <header class="dp-head">
+        <div class="dp-head__text">
+          <div class="dp-tags">
+            <span class="dp-tag dp-tag--blue">{{ subjectLabel(lesson.subject) }}</span>
+            <span class="dp-tag">{{ lesson.grade }}</span>
+            <span v-if="lesson.ai" class="dp-tag dp-tag--solid"><klh-icon name="sparkle" :size="12" :stroke="2.2" />AI 赋能</span>
+            <span v-if="lesson.featured" class="dp-tag dp-tag--orange"><klh-icon name="award" :size="12" :stroke="2.2" />精品课</span>
           </div>
-        </section>
-        <aside class="lesson-aside">
-          <section class="klh-panel lesson-resources">
-            <h2 class="section-title">资源完成状态</h2>
-            <p class="lesson-meta">原始课例：已导入，可下载</p>
-            <p class="lesson-meta">课堂视频、独立课件：未提供</p>
-            <p class="lesson-meta">浏览、点赞与评分统计：未接入</p>
+          <h1 class="dp-title">{{ lesson.title }}</h1>
+          <p class="dp-sub">{{ subjectLabel(lesson.subject) }} · {{ lesson.grade }} · {{ unit.title }} · 第 {{ lessonNo }} 课时</p>
+        </div>
+        <div class="dp-cta">
+          <a :href="url" :download="lesson.sourceName" class="dp-cta__btn">
+            <klh-icon name="download" :size="18" :stroke="2.2" />下载学程设计单
+          </a>
+          <small>原件 · {{ lesson.format }}</small>
+        </div>
+      </header>
+
+      <div class="dp-bar">
+        <div class="dp-bar__meta">
+          <span><klh-icon name="building" :size="16" />{{ lesson.school }}</span>
+          <span><klh-icon name="user" :size="16" />授课教师：{{ lesson.teacher }}</span>
+        </div>
+        <div class="dp-bar__acts">
+          <button type="button" :aria-pressed="String(starred)" @click="starred = !starred">
+            <klh-icon name="star" :size="16" />{{ starred ? '已收藏' : '收藏' }}
+          </button>
+          <button type="button" :aria-pressed="String(liked)" @click="liked = !liked">
+            <klh-icon name="thumbsUp" :size="16" />{{ liked ? '已点赞' : '点赞' }}
+          </button>
+        </div>
+      </div>
+
+      <section class="dp-stage" aria-label="课例展示">
+        <div class="dp-preview dp-preview--paper">
+          <article class="doc-sheet" tabindex="0" :aria-label="`${lesson.title} 原件文本`">
+            <p class="doc-sheet__label">{{ lesson.sourceName }}</p>
+            <pre class="doc-text">{{ lesson.sourceText }}</pre>
+          </article>
+        </div>
+        <aside class="dp-side" aria-label="课时资源">
+          <h2 class="dp-side__head">
+            <span class="dp-side__badge"><klh-icon name="layers" :size="16" :stroke="2.2" /></span>
+            课时资源
+          </h2>
+          <ul class="dp-list">
+            <li class="dp-item is-active">
+              <klh-icon class="dp-item__icon" name="file" :size="18" />
+              <span class="dp-item__label">学程设计单（原件）</span>
+              <a :href="url" :download="lesson.sourceName" class="dp-item__btn" aria-label="下载学程设计单">
+                <klh-icon name="download" :size="15" />
+              </a>
+            </li>
+            <li v-for="k in PENDING_KINDS" :key="k.label" class="dp-item" :style="{ '--c': k.color }">
+              <klh-icon class="dp-item__icon" :name="k.icon" :size="18" />
+              <span class="dp-item__label">{{ k.label }}</span>
+              <span v-if="k.ai" class="dp-item__ai">AI</span>
+              <span class="dp-item__state">待上传</span>
+            </li>
+            <li v-for="r in related" :key="r.id" class="dp-item" style="--c: var(--klh-blue)">
+              <klh-icon class="dp-item__icon" :name="r.type === 'tool' ? 'tool' : 'bot'" :size="18" />
+              <span class="dp-item__label">{{ r.name }}</span>
+              <router-link :to="`/kelihua/resource/${r.id}`" class="dp-item__btn" :aria-label="`查看 ${r.name}`">
+                <klh-icon name="arrowRight" :size="15" />
+              </router-link>
+            </li>
+          </ul>
+          <p class="dp-side__foot">左侧为原件文本，完整排版与图表请下载原件。课件、任务单等资源上传后将在此处展示。</p>
+        </aside>
+      </section>
+
+      <div class="dp-lower">
+        <div>
+          <section class="dp-card">
+            <h2 class="dp-card__title">课程简介</h2>
+            <p class="dp-card__text">{{ lesson.goal }}</p>
           </section>
-          <section class="klh-panel lesson-resources">
-            <h2 class="section-title">本课关联智能体与工具</h2>
-            <button v-for="resource in related" :key="resource.id" type="button" :class="['resource-link', `resource-link--${resource.type}`]" @click="openResource(resource.id)">{{ resource.name }}</button>
-            <p v-if="!related.length" class="lesson-meta">本课尚未提供独立应用资料。</p>
+          <section v-if="unit.bigIdea || unit.task" class="dp-card">
+            <h2 class="dp-card__title">所属大单元 · {{ unit.title }}</h2>
+            <ul class="dp-points">
+              <li v-if="unit.bigIdea">{{ unit.bigIdea }}</li>
+              <li v-if="unit.task">{{ unit.task }}</li>
+            </ul>
           </section>
-          <nav class="klh-panel lesson-resources" aria-label="同主题课例">
-            <h2 class="section-title">同主题课例</h2>
-            <router-link v-for="sibling in siblings" :key="sibling.id" :to="`/kelihua/lesson/${sibling.id}`" class="sibling-link" :aria-current="sibling.id === lesson.id ? 'page' : null">{{ sibling.title }} · {{ sibling.teacher }}</router-link>
+        </div>
+        <aside>
+          <section class="dp-card">
+            <h2 class="dp-card__title">授课教师</h2>
+            <p class="dp-quote">{{ lesson.teacher }} 老师执教的{{ subjectLabel(lesson.subject) }}课例，收录于「{{ unit.title }}」单元。</p>
+            <p class="dp-person">{{ lesson.teacher }} · {{ lesson.school }}</p>
+          </section>
+          <nav v-if="siblings.length > 1" class="dp-card" aria-label="同单元课时">
+            <h2 class="dp-card__title">同单元课时</h2>
+            <ul class="dp-links">
+              <li v-for="(s, i) in siblings" :key="s.id">
+                <router-link :to="`/kelihua/lesson/${s.id}`" :aria-current="s.id === lesson.id ? 'page' : null">
+                  <span>{{ String(i + 1).padStart(2, '0') }} · {{ s.title }}</span>
+                </router-link>
+              </li>
+            </ul>
           </nav>
         </aside>
       </div>
@@ -47,16 +129,29 @@
 </template>
 
 <script>
-import { actions, getters } from '../store';
+import KlhIcon from '../components/KlhIcon.vue';
+import { getters } from '../store';
 import { assetUrl } from '../utils/resources';
+
+const PENDING_KINDS = [
+  { label: 'AI 课件', icon: 'monitor', color: '#d2650a', ai: true },
+  { label: '课堂视频', icon: 'video', color: '#1638b0' },
+  { label: '学习任务单', icon: 'clipboard', color: '#0a6d67' },
+  { label: '课后练习', icon: 'notebook', color: '#0a6d67' }
+];
 
 export default {
   name: 'KlhLessonDetail',
+  components: { KlhIcon },
+  data() {
+    return { PENDING_KINDS, starred: false, liked: false };
+  },
   computed: {
     found() { return getters.findLesson(this.$route.params.id); },
     lesson() { return this.found.lesson; },
     unit() { return this.found.unit; },
     siblings() { return this.found.siblings; },
+    lessonNo() { return this.siblings.findIndex((s) => s.id === this.lesson.id) + 1; },
     url() { return this.found ? assetUrl(this.lesson.asset) : ''; },
     related() {
       return this.found ? getters.published((resource) => this.lesson.resourceIds.includes(resource.id)) : [];
@@ -64,33 +159,45 @@ export default {
   },
   methods: {
     subjectLabel: getters.subjectLabel,
-    openResource: actions.openResource
+    back() {
+      if (window.history.length > 1) this.$router.back();
+      else this.$router.push('/kelihua/course');
+    }
   }
 };
 </script>
 
 <style lang="scss" scoped>
-.lesson-head { padding: 28px 0; }
-.lesson-eyebrow { color: var(--klh-blue); font-size: 13px; font-weight: 700; }
-.lesson-title { margin-top: 10px; font-size: 30px; line-height: 1.4; }
-.lesson-meta { margin-top: 9px; font-size: 13px; line-height: 1.7; color: var(--klh-muted); overflow-wrap: anywhere; }
-.lesson-notice { margin-top: 12px; color: #a35411; font-size: 13px; }
-.lesson-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 24px; align-items: start; }
-.document-panel { overflow: hidden; }
-.document-header { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 24px; border-bottom: 1px solid var(--klh-line); }
-.document-header .klh-btn { flex-shrink: 0; }
-.section-title { font-size: 17px; }
-.document-text { padding: 24px; }
-.source-text { white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; font-size: 15px; line-height: 1.9; margin: 20px 0 0; }
-.lesson-aside { display: flex; flex-direction: column; gap: 16px; }
-.lesson-resources { padding: 20px; }
-.sibling-link { display: block; margin-top: 12px; color: var(--klh-muted); font-size: 14px; }
-.sibling-link[aria-current="page"] { color: var(--klh-blue); font-weight: 700; }
-.resource-link { display: block; margin-top: 14px; padding: 10px; width: 100%; border: 1px solid var(--klh-blue); background: var(--klh-white); border-radius: 8px; color: var(--klh-blue); font: inherit; font-size: 13px; text-align: left; cursor: pointer; }
-.resource-link--tool { border-color: var(--klh-orange); color: #a35411; }
-@media (max-width: 800px) {
-  .lesson-layout { grid-template-columns: 1fr; }
-  .document-header { flex-direction: column; align-items: flex-start; }
-  .lesson-title { font-size: 24px; }
+@import '../styles/detail.scss';
+
+.dp-preview--paper { padding: 28px 32px 0; }
+
+.doc-sheet {
+  height: 100%;
+  max-height: 560px;
+  min-height: 492px;
+  overflow: auto;
+  padding: 36px 44px;
+  border-radius: 10px 10px 0 0;
+  background: var(--klh-white);
+  box-shadow: 0 10px 30px -16px rgba(14, 22, 48, 0.35);
+}
+
+.doc-sheet__label {
+  padding-bottom: 14px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--klh-line);
+  font-size: 12px;
+  color: var(--klh-faint);
+}
+
+.doc-text {
+  margin: 0;
+  font: inherit;
+  font-size: 15px;
+  line-height: 1.9;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: var(--klh-ink);
 }
 </style>

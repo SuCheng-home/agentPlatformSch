@@ -73,7 +73,7 @@ import PageHead from '../components/PageHead.vue';
 import PromptBlock from '../components/prompt-block.vue';
 import TypeBadge from '../components/TypeBadge.vue';
 import KlhIcon from '../components/KlhIcon.vue';
-import state, { actions, getters } from '../store';
+import state, { getters } from '../store';
 
 export default {
   name: 'KlhPromptLibrary',
@@ -122,7 +122,7 @@ export default {
       return getters.domainLabel(p.domain);
     },
     open(p) {
-      actions.openResource(p.id);
+      this.$router.push(`/kelihua/resource/${p.id}`);
     }
   }
 };

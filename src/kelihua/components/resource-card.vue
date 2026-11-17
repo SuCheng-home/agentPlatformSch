@@ -30,7 +30,7 @@
 <script>
 import KlhIcon from './KlhIcon.vue';
 import TypeBadge from './TypeBadge.vue';
-import { actions, getters } from '../store';
+import { getters } from '../store';
 import { copyText } from './prompt-block.vue';
 import { copyContent, resourceUrl } from '../utils/resources';
 
@@ -53,7 +53,7 @@ export default {
   },
   methods: {
     open() {
-      actions.openResource(this.item.id);
+      this.$router.push(`/kelihua/resource/${this.item.id}`);
     },
     async copy() {
       if (!this.copyValue) {

@@ -28,14 +28,12 @@
         <router-view :key="viewKey" />
       </transition>
     </div>
-    <resource-drawer />
   </div>
 </template>
 
 <script>
 import logo from '../assets/logo-klh.png';
 import UserMenu from '../components/user-menu.vue';
-import ResourceDrawer from '../components/resource-drawer.vue';
 import state, { getters } from '../store';
 
 const MATRICES = [
@@ -50,14 +48,18 @@ function matrixIndex(path) {
 
 export default {
   name: 'KlhLayout',
-  components: { UserMenu, ResourceDrawer },
+  components: { UserMenu },
   data() {
     return { logo, state, matrices: MATRICES, transitionName: 'klh-fade', pillStyle: { opacity: 0 } };
   },
   computed: {
     bare() { return this.$route.path === '/kelihua/home'; },
     isWorkflow() { return ['/kelihua/build', '/kelihua/review'].includes(this.$route.path); },
-    activeIndex() { return matrixIndex(this.$route.path); },
+    activeIndex() {
+      const resource = this.$route.path.startsWith('/kelihua/resource/') && getters.findById(this.$route.params.id);
+      if (resource) return MATRICES.findIndex((m) => m.to === `/kelihua/${resource.matrix}`);
+      return matrixIndex(this.$route.path);
+    },
     viewKey() { return this.$route.path; }
   },
   watch: {

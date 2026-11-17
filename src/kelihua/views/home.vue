@@ -1,22 +1,17 @@
 <template>
-  <div class="home">
+  <div class="home" :style="{ '--campus': `url(${campus})`, '--school-name': `url(${schoolName})` }">
     <section class="hero" aria-labelledby="klh-home-title">
-      <img class="hero__art" :src="heroImg" alt="" aria-hidden="true" />
-
       <header class="hero__bar">
         <div class="hero__brand">
-          <span class="hero__logo"><img :src="logo" alt="南京市科利华中学校徽" width="34" height="31" /></span>
-          <span class="hero__school">南京市科利华中学</span>
-        </div>
-        <div class="hero__right">
-          <p class="hero__greet">{{ today }} · {{ teacherName }}，{{ greeting }}</p>
-          <user-menu />
+          <span class="hero__logo"><img :src="logo" alt="" width="40" height="36" /></span>
+          <span class="hero__school" role="img" aria-label="南京市科利华中学" />
         </div>
       </header>
 
       <div class="hero__center">
         <h1 id="klh-home-title" class="hero__title">
           <span class="klh-brush hero__zh">科智汇</span>
+          <span class="hero__sep" aria-hidden="true">｜</span>
           <span class="hero__ai">AI 矩阵平台</span>
         </h1>
         <p class="hero__motto">
@@ -29,12 +24,10 @@
     <nav class="entries" aria-label="三大矩阵入口">
       <router-link v-for="m in matrices" :key="m.key" :to="m.to" :class="['entry', `entry--${m.key}`]">
         <span class="entry__icon"><img :src="m.icon" alt="" width="96" height="96" /></span>
-        <span class="entry__text">
-          <strong class="entry__title">{{ m.title }}</strong>
-          <span class="entry__sub">{{ m.sub }}</span>
-        </span>
+        <strong class="entry__title">{{ m.title }}</strong>
         <span class="entry__arrow" aria-hidden="true">
-          <klh-icon name="arrowRight" :size="20" :stroke="2.2" />
+          进入
+          <klh-icon name="arrowRight" :size="16" :stroke="2.4" />
         </span>
       </router-link>
     </nav>
@@ -51,26 +44,26 @@
 
 <script>
 import KlhIcon from '../components/KlhIcon.vue';
-import UserMenu from '../components/user-menu.vue';
 import logo from '../assets/logo-klh.png';
-import heroImg from '../assets/home-hero-matrix.webp';
+import schoolName from '../assets/school-name.png';
+import campus from '../assets/home-campus.webp';
 import iconSubject from '../assets/icons/mx-subject.webp';
 import iconEducation from '../assets/icons/mx-education.webp';
 import iconCourse from '../assets/icons/mx-course.webp';
-import { getters } from '../store';
 import { navItems } from '../nav';
 
 export default {
   name: 'KlhHome',
-  components: { KlhIcon, UserMenu },
+  components: { KlhIcon },
   data() {
     return {
       logo,
-      heroImg,
+      schoolName,
+      campus,
       matrices: [
-        { key: 'subject', title: '学科应用矩阵', sub: '精准教学 · 智慧教研', to: '/kelihua/subject', icon: iconSubject },
-        { key: 'education', title: '育人管理矩阵', sub: '五育融合 · 全面发展', to: '/kelihua/education', icon: iconEducation },
-        { key: 'course', title: 'AI 赋能学程案例矩阵', sub: '创新实践 · 共建共享', to: '/kelihua/course', icon: iconCourse }
+        { key: 'subject', title: '学科应用矩阵', to: '/kelihua/subject', icon: iconSubject },
+        { key: 'education', title: '育人管理矩阵', to: '/kelihua/education', icon: iconEducation },
+        { key: 'course', title: 'AI 赋能学程案例矩阵', to: '/kelihua/course', icon: iconCourse }
       ]
     };
   },
@@ -78,112 +71,88 @@ export default {
     extras() {
       const hidden = ['/kelihua/home', '/kelihua/prompts', '/kelihua/build'];
       return navItems().filter((item) => !item.matrix && !hidden.includes(item.to));
-    },
-    teacherName() {
-      const name = getters.roleInfo().name;
-      return name.endsWith('老师') ? name : `${name}老师`;
-    },
-    today() {
-      const d = new Date();
-      const week = '日一二三四五六'[d.getDay()];
-      return `${d.getMonth() + 1} 月 ${d.getDate()} 日 星期${week}`;
-    },
-    greeting() {
-      const h = new Date().getHours();
-      if (h < 11) return '早上好';
-      if (h < 14) return '中午好';
-      if (h < 18) return '下午好';
-      return '晚上好';
     }
   }
 };
 </script>
 
 <style lang="scss" scoped>
-/* 上 1/3 主视觉，下 2/3 三大矩阵入口 */
+/* 校园实景铺满整页：上 1/3 标题，下 2/3 三大矩阵入口 */
 .home {
-  display: grid;
-  grid-template-rows: minmax(210px, 1fr) minmax(360px, 2fr) auto;
-  gap: 20px;
-  max-width: 1440px;
-  height: 100vh;
-  min-height: 640px;
-  margin: 0 auto;
-  padding: clamp(16px, 2vw, 28px);
-}
-
-/* 科智汇主视觉，深校徽蓝底，插画在右侧淡入 */
-.hero {
   position: relative;
   isolation: isolate;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 16px;
-  min-height: 0;
-  padding: clamp(16px, 2vw, 26px) clamp(24px, 3.6vw, 56px) clamp(20px, 2.6vw, 34px);
-  border-radius: 24px;
+  display: grid;
+  grid-template-rows: minmax(220px, 1fr) minmax(340px, 2fr) auto;
+  gap: 20px;
+  height: 100vh;
+  min-height: 640px;
+  padding: clamp(16px, 2vw, 28px) max(clamp(16px, 2.4vw, 36px), calc((100vw - 1440px) / 2));
   background: var(--klh-blue-deep);
-  color: var(--klh-white);
   overflow: hidden;
-  box-shadow: 0 24px 48px -28px rgba(13, 36, 120, 0.7);
-  animation: klh-rise 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
 
+  &::before,
   &::after {
     content: '';
     position: absolute;
     inset: 0;
     z-index: -1;
-    background: linear-gradient(90deg, var(--klh-blue-deep) 0%, var(--klh-blue-deep) 28%, rgba(13, 36, 120, 0.35) 50%, rgba(13, 36, 120, 0) 64%);
+  }
+
+  &::before {
+    z-index: -2;
+    background: var(--campus) center 38% / cover no-repeat;
+    animation: klh-zoom 1.2s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+
+  /* 顶部压深蓝保证白字可读，中段透出操场与教学楼 */
+  &::after {
+    background:
+      linear-gradient(180deg, rgba(13, 36, 120, 0.86) 0%, rgba(13, 36, 120, 0.6) 26%, rgba(13, 36, 120, 0.12) 52%, rgba(13, 36, 120, 0.05) 72%, rgba(13, 36, 120, 0.5) 100%);
   }
 }
 
-/* AI 主视觉：玻璃立方矩阵 + 光流汇聚至智能核心，左侧留深蓝给标题 */
-.hero__art {
-  position: absolute;
-  inset: 0 0 0 auto;
-  z-index: -2;
-  width: min(82%, 1180px);
-  height: 100%;
-  object-fit: cover;
-  object-position: right center;
+.hero {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 0;
+  color: var(--klh-white);
+  animation: klh-rise 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
 
 .hero__bar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
 }
 
 .hero__brand {
   display: flex;
   align-items: center;
-  gap: 12px;
-
+  gap: 14px;
 }
 
 .hero__logo {
   display: grid;
   place-items: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
   background: var(--klh-white);
+  box-shadow: 0 6px 18px -8px rgba(0, 0, 0, 0.5);
 
-  img { width: 34px; height: 31px; object-fit: contain; }
+  img { width: 40px; height: 36px; object-fit: contain; }
 }
 
-.hero__right {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
+/* 书法校名为黑色透明底 PNG，用遮罩染成白色 */
 .hero__school {
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: 0.16em;
+  display: block;
+  width: clamp(180px, 20vw, 260px);
+  aspect-ratio: 613 / 90;
+  background: var(--klh-white);
+  -webkit-mask: var(--school-name) left center / contain no-repeat;
+  mask: var(--school-name) left center / contain no-repeat;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
 }
 
 .hero__center {
@@ -195,143 +164,131 @@ export default {
 
 .hero__title {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: 4px 20px;
+  gap: 0 clamp(6px, 0.8vw, 12px);
+  white-space: nowrap;
+  text-shadow: 0 6px 24px rgba(5, 16, 60, 0.45);
 }
 
 .hero__zh {
-  font-size: clamp(48px, 5.4vw, 88px);
+  font-size: clamp(44px, 5.2vw, 84px);
   line-height: 1;
-  white-space: nowrap;
   letter-spacing: 0.04em;
-  color: var(--klh-white);
-  text-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+}
+
+.hero__sep {
+  font-size: clamp(32px, 3.6vw, 58px);
+  font-weight: 300;
+  line-height: 1;
+  opacity: 0.7;
 }
 
 .hero__ai {
-  padding: 6px 16px;
-  border-radius: 10px;
-  background: var(--klh-orange);
-  font-size: clamp(16px, 1.6vw, 22px);
+  font-size: clamp(28px, 3.2vw, 52px);
   font-weight: 800;
-  letter-spacing: 0.24em;
-  line-height: 1.3;
-  color: var(--klh-white);
+  letter-spacing: 0.1em;
+  line-height: 1;
 }
 
 .hero__motto {
   display: flex;
   align-items: center;
   gap: 14px;
-  font-size: clamp(16px, 1.5vw, 20px);
+  font-size: clamp(15px, 1.4vw, 19px);
   font-weight: 600;
   letter-spacing: 0.16em;
   white-space: nowrap;
+  text-shadow: 0 2px 10px rgba(5, 16, 60, 0.5);
 
   .rule { width: 40px; height: 2px; background: var(--klh-orange); }
   .gap { display: inline-block; width: 1em; }
 }
 
-.hero__greet {
-  font-size: 14px;
-  letter-spacing: 0.06em;
-  text-shadow: 0 1px 6px rgba(8, 20, 70, 0.8);
-}
-
-/* 下：三大矩阵入口，实色卡片 + 白字 */
+/* 三大矩阵入口：图标与标题居中，色块半透以融入校园照片 */
 .entries {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 20px;
+  align-content: center;
+  gap: clamp(14px, 1.8vw, 24px);
   min-height: 0;
 }
 
 .entry {
-  --tone: var(--klh-orange);
-  --tone-deep: #a94f05;
+  --tone: 210, 101, 10;
   position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-rows: 1fr auto;
-  align-items: end;
-  gap: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(12px, 1.4vw, 18px);
+  height: 100%;
+  max-height: 420px;
   min-height: 0;
-  padding: clamp(22px, 2.4vw, 34px);
-  border-radius: 24px;
-  overflow: hidden;
-  background: linear-gradient(135deg, var(--tone) 0%, var(--tone-deep) 100%);
+  padding: clamp(20px, 2.4vw, 32px);
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: linear-gradient(160deg, rgba(var(--tone), 0.9) 0%, rgba(var(--tone), 0.78) 100%);
+  backdrop-filter: blur(10px) saturate(1.2);
   color: var(--klh-white);
-  box-shadow: 0 18px 32px -22px var(--tone-deep);
+  text-align: center;
+  box-shadow: 0 22px 40px -24px rgba(5, 16, 60, 0.8);
   animation: klh-rise 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.25s, box-shadow 0.25s;
 
   &:nth-child(1) { animation-delay: 0.1s; }
   &:nth-child(2) { animation-delay: 0.18s; }
   &:nth-child(3) { animation-delay: 0.26s; }
 
   &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 24px 40px -20px var(--tone-deep);
+    transform: translateY(-6px);
+    box-shadow: 0 30px 48px -22px rgba(5, 16, 60, 0.85);
   }
-  &:hover .entry__arrow { background: var(--klh-white); color: var(--tone-deep); }
+  &:hover .entry__arrow { background: var(--klh-white); color: rgb(var(--tone)); }
+  &:hover .entry__icon { transform: scale(1.06) rotate(-3deg); }
 
-  &--education { --tone: var(--klh-blue); --tone-deep: var(--klh-blue-deep); }
-  &--course { --tone: var(--klh-teal); --tone-deep: #064843; }
+  &--education { --tone: 22, 56, 176; }
+  &--course { --tone: 10, 109, 103; }
 }
 
 .entry__icon {
-  grid-column: 1 / -1;
-  align-self: start;
   display: grid;
   place-items: center;
-  width: clamp(96px, 9vw, 136px);
-  height: clamp(96px, 9vw, 136px);
+  width: clamp(96px, 9.4vw, 144px);
+  height: clamp(96px, 9.4vw, 144px);
   border-radius: 50%;
   background: var(--klh-white);
-  box-shadow: 0 14px 28px -14px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 0 8px rgba(255, 255, 255, 0.18), 0 16px 30px -14px rgba(0, 0, 0, 0.55);
   transition: transform 0.3s;
 
   img { width: 78%; height: 78%; object-fit: contain; }
-
-  .entry:hover & { transform: scale(1.05) rotate(-3deg); }
-}
-
-.entry__text {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 0;
 }
 
 .entry__title {
-  font-size: clamp(22px, 2vw, 30px);
+  font-size: clamp(20px, 1.9vw, 28px);
   font-weight: 800;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   line-height: 1.3;
   text-wrap: balance;
 }
 
-.entry__sub {
-  font-size: 14px;
-  letter-spacing: 0.1em;
-  opacity: 0.92;
-}
-
 .entry__arrow {
-  flex-shrink: 0;
-  display: grid;
-  place-items: center;
-  width: 42px;
-  height: 42px;
-  border: 2px solid var(--klh-white);
-  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 16px 0 18px;
+  border: 1.5px solid rgba(255, 255, 255, 0.85);
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   transition: background 0.2s, color 0.2s;
 }
 
 .quick {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 10px;
 }
 
@@ -342,8 +299,9 @@ export default {
   height: 40px;
   padding: 0 18px;
   border-radius: 999px;
-  border: 1.5px solid var(--klh-line-strong);
-  background: var(--klh-white);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(8px);
   font-size: 14px;
   font-weight: 600;
   color: var(--klh-ink);
@@ -370,26 +328,36 @@ export default {
   to { opacity: 1; transform: none; }
 }
 
+@keyframes klh-zoom {
+  from { transform: scale(1.06); }
+  to { transform: none; }
+}
+
 @media (max-width: 860px) {
-  .home { height: auto; min-height: 100vh; grid-template-rows: auto auto auto; }
-  .hero { min-height: 240px; }
-  .hero__greet { display: none; }
+  .home { height: auto; min-height: 100vh; grid-template-rows: auto auto auto; overflow: visible; }
+  .home::before { position: fixed; }
+  .hero { min-height: 220px; }
   .entries { grid-template-columns: 1fr; gap: 14px; }
-  .entry { grid-template-columns: auto minmax(0, 1fr) auto; grid-template-rows: auto; align-items: center; min-height: 120px; }
-  .entry__icon { grid-column: auto; align-self: center; width: 80px; height: 80px; }
-  .hero__art { width: 100%; opacity: 0.6; }
+  .entry { flex-direction: row; justify-content: flex-start; height: auto; text-align: left; }
+  .entry__icon { width: 76px; height: 76px; flex-shrink: 0; }
+  .entry__title { flex: 1; }
+  .entry__arrow { padding: 0 12px; }
 }
 
 @media (max-width: 560px) {
-  .hero__school { display: none; }
+  .hero__school { width: 160px; }
+  .hero__zh { font-size: 40px; }
+  .hero__sep { font-size: 28px; }
+  .hero__ai { font-size: 22px; letter-spacing: 0.04em; }
   .hero__motto .rule { display: none; }
   .hero__motto { white-space: normal; }
   .entry { gap: 14px; padding: 16px; }
-  .entry__icon { width: 64px; height: 64px; }
+  .entry__icon { width: 60px; height: 60px; }
+  .entry__arrow { font-size: 0; gap: 0; width: 36px; padding: 0; justify-content: center; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero, .entry { animation: none; }
-  .entry, .entry__arrow { transition: none; }
+  .home::before, .hero, .entry { animation: none; }
+  .entry, .entry__arrow, .entry__icon { transition: none; }
 }
 </style>
