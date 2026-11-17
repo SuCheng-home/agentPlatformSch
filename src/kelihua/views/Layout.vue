@@ -5,6 +5,7 @@
       <router-link to="/kelihua/home" class="top-brand" aria-label="返回科智汇首页">
         <img :src="logo" alt="" width="40" height="36" />
         <span class="klh-brush">科智汇</span>
+        <span class="top-brand__sub">AI 矩阵平台</span>
       </router-link>
 
       <nav ref="tabs" class="top-tabs" aria-label="三大矩阵">
@@ -150,7 +151,25 @@ export default {
   flex-shrink: 0;
 
   img { width: 40px; height: 36px; object-fit: contain; }
-  .klh-brush { font-size: 24px; line-height: 1; color: var(--klh-blue-deep); }
+  .klh-brush { font-size: 24px; line-height: 1; color: var(--klh-blue-deep); white-space: nowrap; }
+}
+
+.top-brand__sub {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--klh-ink);
+  white-space: nowrap;
+
+  &::before {
+    content: '';
+    width: 1px;
+    height: 16px;
+    background: var(--klh-line-strong);
+  }
 }
 
 .top-tabs {
@@ -219,7 +238,8 @@ export default {
 
 @media (max-width: 760px) {
   .klh-top { gap: 10px; height: auto; padding-top: 10px; padding-bottom: 10px; flex-wrap: wrap; }
-  .top-brand .klh-brush { display: none; }
+  .top-brand .klh-brush { font-size: 20px; }
+  .top-brand__sub { font-size: 13px; }
   .top-tabs { order: 3; flex-basis: 100%; }
   .top-tab { padding: 0 14px; font-size: 14px; }
 }

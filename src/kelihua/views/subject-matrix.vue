@@ -1,32 +1,31 @@
 <template>
   <div class="klh-page sm">
-    <header class="sm-head">
-      <div class="sm-head__text">
-        <h1 class="sm-title">学科应用矩阵</h1>
-        <p class="sm-legend">
-          <span class="legend legend--tool">工具</span>
-          <span class="legend legend--agent">智能体</span>
-        </p>
-      </div>
-      <label class="klh-search sm-search">
-        <KlhIcon name="search" :size="16" />
-        <span class="sr-only">搜索资源或教师</span>
-        <input v-model.trim="keyword" type="search" placeholder="搜索资源或教师" />
-      </label>
-    </header>
+    <h1 class="sr-only">学科应用矩阵</h1>
 
-    <nav class="sm-subjects" aria-label="学科">
-      <button
-        v-for="item in subjectTabs"
-        :key="item.key"
-        type="button"
-        :class="['sm-subject', { 'is-active': subject === item.key }]"
-        :aria-current="subject === item.key ? 'page' : null"
-        @click="setSubject(item.key)"
-      >
-        {{ item.label }}
-      </button>
-    </nav>
+    <div class="sm-filter klh-panel" role="group" aria-label="资源筛选">
+      <div class="sm-filter__row">
+        <span class="sm-filter__label">学科</span>
+        <button
+          v-for="item in subjectTabs"
+          :key="item.key"
+          type="button"
+          :class="['klh-chip', { 'is-active': subject === item.key }]"
+          :aria-pressed="String(subject === item.key)"
+          @click="setSubject(item.key)"
+        >{{ item.label }}</button>
+      </div>
+      <div class="sm-filter__row">
+        <span class="sm-filter__label">类型</span>
+        <button
+          v-for="t in TYPES"
+          :key="t.key"
+          type="button"
+          :class="['sm-type', `sm-type--${t.key}`, { 'is-active': types.includes(t.key) }]"
+          :aria-pressed="String(types.includes(t.key))"
+          @click="toggleType(t.key)"
+        >{{ t.label }}</button>
+      </div>
+    </div>
 
     <nav :class="['sm-modules', { 'is-few': blocks.length <= 3 }]" :aria-label="`${subjectLabel(subject)}模块`">
       <a
@@ -53,28 +52,18 @@
           <img :src="art(block.key)" alt="" width="480" height="262" loading="lazy" />
         </span>
         <h2 :id="`mod-title-${block.key}`" class="sm-block__title">{{ block.label }}</h2>
-        <span class="sm-block__count">{{ block.items.length ? `${block.items.length} 项资源` : '整理中' }}</span>
       </header>
       <div v-if="block.items.length" class="sm-grid">
         <MatrixCard v-for="item in block.items" :key="item.id" :item="item" />
       </div>
-      <div v-else class="sm-placeholder">
-        <KlhIcon name="layers" :size="22" />
-        <span>{{ ready ? '本模块资源整理中' : '真实资源整理中，即将上线' }}</span>
-      </div>
+      <div v-else class="sm-blank" />
     </section>
 
-    <div v-if="!keyword && !visibleBlocks.length" class="sm-placeholder sm-placeholder--subject">
-      <KlhIcon name="layers" :size="22" />
-      <span>{{ subjectLabel(subject) }}学科资源整理中，敬请期待</span>
-    </div>
-
-    <div v-if="keyword && !visibleBlocks.length" class="klh-empty">没有找到「{{ keyword }}」相关的资源。</div>
+    <div v-if="!visibleBlocks.length" class="sm-blank sm-blank--subject" />
   </div>
 </template>
 
 <script>
-import KlhIcon from '../components/KlhIcon.vue';
 import MatrixCard from '../components/matrix-card.vue';
 import { SUBJECT_MODULES } from '../data/subject-modules';
 import state, { getters } from '../store';
@@ -84,12 +73,16 @@ const MODULE_ART = Object.fromEntries(
     .map(([path, url]) => [path.split('/').pop().replace('.webp', ''), url])
 );
 const DEFAULT_SUBJECT = 'wl';
+const TYPES = [
+  { key: 'tool', label: '工具' },
+  { key: 'agent', label: '智能体' }
+];
 
 export default {
   name: 'KlhSubjectMatrix',
-  components: { KlhIcon, MatrixCard },
+  components: { MatrixCard },
   data() {
-    return { subject: DEFAULT_SUBJECT, keyword: '' };
+    return { TYPES, subject: DEFAULT_SUBJECT, types: TYPES.map((t) => t.key) };
   },
   computed: {
     subjectTabs() {
@@ -100,15 +93,10 @@ export default {
     config() {
       return SUBJECT_MODULES[this.subject] || { ready: false, modules: [] };
     },
-    ready() {
-      return this.config.ready;
-    },
     resources() {
-      const keyword = this.keyword.toLocaleLowerCase();
       return getters.published((resource) => resource.matrix === 'subject'
         && resource.subject === this.subject
-        && ['agent', 'tool'].includes(resource.type)
-        && `${resource.name} ${resource.author}`.toLocaleLowerCase().includes(keyword));
+        && this.types.includes(resource.type));
     },
     blocks() {
       return this.config.modules.map((module) => this.withItems(module));
@@ -117,8 +105,7 @@ export default {
       return this.config.common ? this.withItems(this.config.common) : null;
     },
     visibleBlocks() {
-      const all = [...this.blocks, ...(this.commonBlock && this.commonBlock.items.length ? [this.commonBlock] : [])];
-      return this.keyword ? all.filter((block) => block.items.length) : all;
+      return [...this.blocks, ...(this.commonBlock && this.commonBlock.items.length ? [this.commonBlock] : [])];
     }
   },
   watch: {
@@ -138,8 +125,14 @@ export default {
     setSubject(subject) {
       if (subject === this.subject) return;
       this.subject = subject;
-      this.keyword = '';
       this.$router.replace({ query: { ...this.$route.query, subject } }).catch(() => {});
+    },
+    toggleType(type) {
+      if (!this.types.includes(type)) {
+        this.types = [...this.types, type];
+      } else if (this.types.length > 1) {
+        this.types = this.types.filter((t) => t !== type);
+      }
     },
     jump(key) {
       const el = document.getElementById(`mod-${key}`);
@@ -160,88 +153,65 @@ export default {
 .tone-slate { --tone: #3d4a66; --tint: #eaedf3; }
 .tone-stone { --tone: #5c564f; --tint: #efece7; }
 
-.sm-head {
+.sm-filter {
   display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 20px;
-  padding-bottom: 20px;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 20px;
 }
 
-.sm-head__text {
+.sm-filter__row {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   flex-wrap: wrap;
-  gap: 12px 20px;
+  gap: 4px;
 }
 
-.sm-title {
-  font-size: clamp(28px, 3.4vw, 40px);
-  font-weight: 900;
-  letter-spacing: 0.04em;
-  line-height: 1.1;
+.sm-filter__label {
+  width: 48px;
+  font-size: 13px;
+  font-weight: 700;
   color: var(--klh-ink);
 }
 
-.sm-legend {
-  display: flex;
-  gap: 14px;
-  font-size: 14px;
-  color: var(--klh-muted);
-}
-
-.legend {
+/* 类型筛选沿用全平台约定：橙 = 工具，蓝 = 智能体；可多选，至少保留一项 */
+.sm-type {
+  --c: var(--klh-orange);
+  --c-tint: var(--klh-orange-tint);
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  height: 32px;
+  padding: 0 14px;
+  border: 1px solid var(--klh-line-strong);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--klh-muted);
+  font: inherit;
+  font-size: 14px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s, border-color 0.18s;
 
   &::before {
     content: '';
-    width: 10px;
-    height: 10px;
-    border-radius: 3px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
     background: var(--c);
+    opacity: 0.45;
   }
-  &--tool { --c: var(--klh-orange); }
-  &--agent { --c: var(--klh-blue); }
-}
+  &--agent { --c: var(--klh-blue); --c-tint: var(--klh-blue-tint); }
+  & + & { margin-left: 4px; }
 
-.sm-search { border-radius: 999px; }
-
-.sm-subjects {
-  display: flex;
-  gap: 6px;
-  padding: 6px;
-  width: 100%;
-  overflow-x: auto;
-  border-radius: 999px;
-  background: var(--klh-white);
-  box-shadow: inset 0 0 0 1px var(--klh-line);
-  scrollbar-width: none;
-  &::-webkit-scrollbar { display: none; }
-}
-
-.sm-subject {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  flex: 1 0 auto;
-  height: 40px;
-  padding: 0 16px;
-  border: 0;
-  border-radius: 999px;
-  background: transparent;
-  color: var(--klh-ink);
-  font: inherit;
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  cursor: pointer;
-  transition: background 0.18s, color 0.18s;
-
-  &:hover:not(.is-active) { background: var(--klh-ink-tint); }
-  &.is-active { background: var(--klh-blue-tint); color: var(--klh-blue); }
+  &:hover { color: var(--klh-ink); }
+  &.is-active {
+    border-color: transparent;
+    background: var(--c-tint);
+    color: var(--c);
+    font-weight: 600;
+    &::before { opacity: 1; }
+  }
 }
 
 .sm-modules {
@@ -347,27 +317,8 @@ export default {
   text-wrap: balance;
 }
 
-.sm-block__count {
-  flex-shrink: 0;
-  height: 26px;
-  padding: 0 10px;
-  border-radius: 999px;
-  background: var(--tint);
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 26px;
-  letter-spacing: 0.04em;
-}
-
-.sm-block .sm-placeholder {
-  min-height: 96px;
-  border: 0;
-  background: var(--tint);
-  color: var(--tone);
-  opacity: 0.8;
-}
-
-.sm-placeholder--subject { margin-top: 24px; min-height: 240px; }
+.sm-blank { min-height: 160px; }
+.sm-blank--subject { min-height: 320px; }
 
 .sm-grid {
   display: grid;
@@ -375,21 +326,8 @@ export default {
   gap: 20px;
 }
 
-.sm-placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  min-height: 140px;
-  border-radius: 18px;
-  border: 2px dashed var(--klh-line-strong);
-  color: var(--klh-muted);
-  font-size: 15px;
-}
-
 @media (max-width: 760px) {
-  .sm-head { align-items: stretch; flex-direction: column; }
-  .sm-search { width: 100%; }
+  .sm-filter { padding: 14px; }
   .sm-modules, .sm-modules.is-few { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
   .sm-module { min-height: 128px; padding: 14px; }
   .sm-module__label { font-size: 22px; }

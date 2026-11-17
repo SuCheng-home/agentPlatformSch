@@ -9,19 +9,19 @@
           v-for="s in subjectOptions"
           :key="s.key"
           type="button"
-          :class="['klh-chip', { 'is-active': subject === s.key }]"
-          :aria-pressed="String(subject === s.key)"
+          :class="['klh-chip', { 'is-active': currentSubject === s.key }]"
+          :aria-pressed="String(currentSubject === s.key)"
           @click="setSubject(s.key)"
         >{{ s.label }}</button>
       </div>
       <div class="cfilter__row">
         <span class="cfilter__label">年级</span>
         <button
-          v-for="g in ['全部', ...state.grades, '年级待核实']"
+          v-for="g in gradeOptions"
           :key="g"
           type="button"
-          :class="['klh-chip', { 'is-active': grade === g }]"
-          :aria-pressed="String(grade === g)"
+          :class="['klh-chip', { 'is-active': currentGrade === g }]"
+          :aria-pressed="String(currentGrade === g)"
           @click="setGrade(g)"
         >{{ g }}</button>
       </div>
@@ -113,17 +113,29 @@ export default {
   name: 'KlhCaseMatrix',
   components: { KlhIcon },
   data() {
-    return { state, LESSON_KINDS, subject: 'all', grade: '全部', activeId: null };
+    return { state, LESSON_KINDS, subject: '', grade: '', activeId: null };
   },
   computed: {
     subjectOptions() {
       const used = new Set(state.lessonUnits.map((u) => u.subject));
-      return [{ key: 'all', label: '全部' }, ...state.subjects.filter((s) => used.has(s.key))];
+      return state.subjects.filter((s) => used.has(s.key));
+    },
+    currentSubject() {
+      return this.subjectOptions.some((s) => s.key === this.subject) ? this.subject : (this.subjectOptions[0] || {}).key;
+    },
+    gradeOptions() {
+      const used = new Set(state.lessonUnits
+        .filter((unit) => unit.subject === this.currentSubject)
+        .flatMap((unit) => unit.lessons.map((lesson) => lesson.grade || '年级待核实')));
+      return [...state.grades, '年级待核实'].filter((g) => used.has(g));
+    },
+    currentGrade() {
+      return this.gradeOptions.includes(this.grade) ? this.grade : this.gradeOptions[0];
     },
     units() {
       return state.lessonUnits
-        .filter((unit) => this.subject === 'all' || unit.subject === this.subject)
-        .map((unit) => ({ ...unit, lessons: unit.lessons.filter((lesson) => this.grade === '全部' || lesson.grade === this.grade) }))
+        .filter((unit) => unit.subject === this.currentSubject)
+        .map((unit) => ({ ...unit, lessons: unit.lessons.filter((lesson) => (lesson.grade || '年级待核实') === this.currentGrade) }))
         .filter((unit) => unit.lessons.length);
     },
     active() {
