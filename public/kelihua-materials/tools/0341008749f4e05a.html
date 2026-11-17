@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>探密求真 巧鉴真金——测量物质的密度</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.2.1/dist/chartjs-plugin-annotation.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 25px 0;
+            background: linear-gradient(135deg, #1a6fc4 0%, #0d4d8a 100%);
+            color: white;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .platform-selector {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            background-color: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        
+        .platform-tab {
+            flex: 1;
+            text-align: center;
+            padding: 18px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 4px solid transparent;
+        }
+        
+        .platform-tab.active {
+            background-color: #e8f2ff;
+            color: #1a6fc4;
+            border-bottom: 4px solid #1a6fc4;
+        }
+        
+        .platform-tab:hover {
+            background-color: #f0f7ff;
+        }
+        
+        .platform-content {
+            display: none;
+            background-color: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            min-height: 600px;
+        }
+        
+        .platform-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .student-platform {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .data-input-section {
+            flex: 2;
+        }
+        
+        .density-table-section {
+            flex: 1;
+            background-color: #f8fafd;
+            border-radius: 10px;
+            padding: 25px;
+            border-left: 5px solid #1a6fc4;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            color: #1a6fc4;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eaeff5;
+        }
+        
+        .group-selector {
+            margin-bottom: 25px;
+        }
+        
+        .group-selector label {
+            font-weight: 600;
+            margin-right: 15px;
+            font-size: 1.1rem;
+        }
+        
+        .group-selector select {
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 2px solid #d1d9e6;
+            font-size: 1rem;
+            width: 200px;
+            background-color: white;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 25px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .data-table th {
+            background-color: #1a6fc4;
+            color: white;
+            padding: 16px 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .data-table td {
+            padding: 14px 12px;
+            border-bottom: 1px solid #eaeff5;
+        }
+        
+        .data-table tr:hover {
+            background-color: #f8fafd;
+        }
+        
+        .data-table input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d1d9e6;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        
+        .data-table input:focus {
+            outline: none;
+            border-color: #1a6fc4;
+            box-shadow: 0 0 0 2px rgba(26, 111, 196, 0.2);
+        }
+        
+        .density-result {
+            font-weight: 600;
+            color: #1a6fc4;
+        }
+        
+        .action-button {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .delete-btn {
+            background-color: #ffeaea;
+            color: #e74c3c;
+        }
+        
+        .delete-btn:hover {
+            background-color: #fad2d2;
+        }
+        
+        .confirm-btn {
+            background-color: #e8f4ff;
+            color: #1a6fc4;
+        }
+        
+        .confirm-btn:hover {
+            background-color: #d4e7ff;
+        }
+        
+        .add-row-btn {
+            background-color: #f0f7ff;
+            color: #1a6fc4;
+            margin-bottom: 20px;
+        }
+        
+        .add-row-btn:hover {
+            background-color: #e1eeff;
+        }
+        
+        .submit-btn {
+            background-color: #1a6fc4;
+            color: white;
+            padding: 14px 28px;
+            font-size: 1.1rem;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .submit-btn:hover {
+            background-color: #155a9c;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(26, 111, 196, 0.3);
+        }
+        
+        .density-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        .density-table th, .density-table td {
+            padding: 14px 12px;
+            text-align: left;
+            border-bottom: 1px solid #eaeff5;
+        }
+        
+        .density-table th {
+            background-color: #e8f2ff;
+            color: #1a6fc4;
+            font-weight: 600;
+        }
+        
+        .density-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .material-name {
+            font-weight: 600;
+        }
+        
+        .teacher-platform {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .teacher-data-section {
+            flex: 1;
+        }
+        
+        .teacher-chart-section {
+            flex: 2;
+            background-color: #f8fafd;
+            border-radius: 10px;
+            padding: 25px;
+            border-left: 5px solid #1a6fc4;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 450px;
+            margin-top: 20px;
+        }
+        
+        .teacher-controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .teacher-btn {
+            background-color: #1a6fc4;
+            color: white;
+            padding: 12px 20px;
+        }
+        
+        .teacher-btn:hover {
+            background-color: #155a9c;
+        }
+        
+        .average-density {
+            margin-top: 25px;
+            padding: 20px;
+            background-color: #e8f4ff;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .average-density.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .average-density h3 {
+            color: #1a6fc4;
+            margin-bottom: 15px;
+        }
+        
+        .average-results {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .material-average {
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            min-width: 180px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .material-average .material-name {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        
+        .material-average .density-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #1a6fc4;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eaeff5;
+            color: #777;
+            font-size: 0.9rem;
+        }
+        
+        .color-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .cluster-info {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #fff8e1;
+            border-radius: 8px;
+            border-left: 4px solid #ffc107;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 1200px) {
+            .student-platform, .teacher-platform {
+                flex-direction: column;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .platform-tab {
+                padding: 15px 10px;
+                font-size: 1.1rem;
+            }
+            
+            .platform-content {
+                padding: 20px;
+            }
+            
+            .section-title {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>探密求真 巧鉴真金</h1>
+            <div class="subtitle">测量物质的密度实验平台 - 南京市科利华中学物理组</div>
+        </header>
+        
+        <div class="platform-selector">
+            <div class="platform-tab active" id="student-tab">
+                <i class="fas fa-user-graduate"></i> 学生实验平台
+            </div>
+            <div class="platform-tab" id="teacher-tab">
+                <i class="fas fa-chalkboard-teacher"></i> 教师监控平台
+            </div>
+        </div>
+        
+        <!-- 学生平台 -->
+        <div class="platform-content active" id="student-platform">
+            <div class="student-platform">
+                <div class="data-input-section">
+                    <h2 class="section-title">实验数据记录表</h2>
+                    
+                    <div class="group-selector">
+                        <label for="group-select">选择实验小组：</label>
+                        <select id="group-select">
+                            <option value="1">第1组</option>
+                            <option value="2">第2组</option>
+                            <option value="3">第3组</option>
+                            <option value="4">第4组</option>
+                            <option value="5">第5组</option>
+                            <option value="6">第6组</option>
+                            <option value="7">第7组</option>
+                            <option value="8">第8组</option>
+                            <option value="9">第9组</option>
+                            <option value="10">第10组</option>
+                            <option value="11">第11组</option>
+                            <option value="12">第12组</option>
+                        </select>
+                    </div>
+                    
+                    <button class="action-button add-row-btn" id="add-row-btn">
+                        <i class="fas fa-plus-circle"></i> 添加数据行
+                    </button>
+                    
+                    <table class="data-table" id="data-table">
+                        <thead>
+                            <tr>
+                                <th>序号</th>
+                                <th>质量 m/g</th>
+                                <th>体积 V/cm³</th>
+                                <th>密度 ρ/g·cm⁻³</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            <!-- 数据行将通过JavaScript动态添加 -->
+                        </tbody>
+                    </table>
+                    
+                    <button class="action-button submit-btn" id="submit-btn">
+                        <i class="fas fa-paper-plane"></i> 提交实验数据
+                    </button>
+                </div>
+                
+                <div class="density-table-section">
+                    <h2 class="section-title">常见物质密度参考表</h2>
+                    <p>单位：g·cm⁻³（常温常压下）</p>
+                    
+                    <table class="density-table">
+                        <thead>
+                            <tr>
+                                <th>物质</th>
+                                <th>密度</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="material-name">金 (Gold)</td>
+                                <td>19.3</td>
+                            </tr>
+                            <tr>
+                                <td class="material-name">银 (Silver)</td>
+                                <td>10.5</td>
+                            </tr>
+                            <tr>
+                                <td class="material-name">纯铜 (Pure Copper)</td>
+                                <td>8.9</td>
+                            </tr>
+                            <tr>
+                                <td class="material-name">黄铜 (Brass)</td>
+                                <td>8.4</td>
+                            </tr>
+                            <tr>
+                                <td class="material-name">树脂 (Resin)</td>
+                                <td>1.2</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div style="margin-top: 25px; padding: 15px; background-color: #fff8e1; border-radius: 8px; border-left: 4px solid #ffc107;">
+                        <h3 style="color: #d48806; margin-bottom: 10px;"><i class="fas fa-lightbulb"></i> 实验提示</h3>
+                        <p style="font-size: 0.95rem;">1. 使用天平测量物体的质量<br>2. 使用量筒或排水法测量物体的体积<br>3. 根据公式 ρ = m/V 计算密度<br>4. 与密度表对比，鉴别物质种类</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 教师平台 -->
+        <div class="platform-content" id="teacher-platform">
+            <div class="teacher-platform">
+                <div class="teacher-data-section">
+                    <h2 class="section-title">学生实验数据汇总</h2>
+                    <p>实时显示所有小组提交的实验数据</p>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <button class="action-button teacher-btn" id="refresh-data-btn">
+                            <i class="fas fa-sync-alt"></i> 更新数据
+                        </button>
+                    </div>
+                    
+                    <div style="overflow-x: auto;">
+                        <table class="data-table" id="teacher-data-table">
+                            <thead>
+                                <tr>
+                                    <th>小组</th>
+                                    <th>质量 m/g</th>
+                                    <th>体积 V/cm³</th>
+                                    <th>密度 ρ/g·cm⁻³</th>
+                                </tr>
+                            </thead>
+                            <tbody id="teacher-table-body">
+                                <!-- 教师端数据将通过JavaScript动态添加 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="teacher-chart-section">
+                    <h2 class="section-title">质量-体积关系图</h2>
+                    <p>横轴：体积 V/cm³，纵轴：质量 m/g</p>
+                    
+                    <div class="chart-container">
+                        <canvas id="density-chart"></canvas>
+                    </div>
+                    
+                    <div class="teacher-controls">
+                        <button class="action-button teacher-btn" id="refresh-chart-btn">
+                            <i class="fas fa-chart-line"></i> 更新图表
+                        </button>
+                        <button class="action-button teacher-btn" id="fit-data-btn">
+                            <i class="fas fa-ruler-combined"></i> 数据拟合
+                        </button>
+                        <button class="action-button teacher-btn" id="average-density-btn">
+                            <i class="fas fa-calculator"></i> 计算平均密度
+                        </button>
+                    </div>
+                    
+                    <div class="cluster-info" id="cluster-info">
+                        <strong><i class="fas fa-info-circle"></i> 数据拟合说明：</strong> 
+                        系统将根据密度值的相似度自动将数据分为3类，每类代表一种未知物质。数据明显异常（密度值小于0.5或大于25）将不参与拟合。
+                    </div>
+                    
+                    <div class="average-density" id="average-density-display">
+                        <h3><i class="fas fa-chart-bar"></i> 各物质平均密度计算结果</h3>
+                        <div class="average-results" id="average-results">
+                            <!-- 平均密度结果将通过JavaScript动态添加 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>© 2023 初中物理实验平台 - 探密求真 巧鉴真金 | 设计用于初中物理密度测量实验教学</p>
+            <p>本平台模拟数据仅供参考，实际实验请遵循实验室安全规范</p>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let currentGroup = 1;
+        let studentData = JSON.parse(localStorage.getItem('densityExperimentData')) || {};
+        let chart = null;
+        let clusterColors = ['#FF6B6B', '#4ECDC4', '#FFD166'];
+        
+        // 初始化学生平台
+        function initStudentPlatform() {
+            const groupSelect = document.getElementById('group-select');
+            const addRowBtn = document.getElementById('add-row-btn');
+            const submitBtn = document.getElementById('submit-btn');
+            const tableBody = document.getElementById('table-body');
+            
+            // 设置当前小组
+            groupSelect.value = currentGroup;
+            
+            // 小组选择事件
+            groupSelect.addEventListener('change', function() {
+                currentGroup = parseInt(this.value);
+                loadGroupData(currentGroup);
+            });
+            
+            // 添加数据行
+            addRowBtn.addEventListener('click', addDataRow);
+            
+            // 提交数据
+            submitBtn.addEventListener('click', submitData);
+            
+            // 初始加载小组数据
+            loadGroupData(currentGroup);
+            
+            // 如果没有数据，添加一行初始数据
+            if (tableBody.children.length === 0) {
+                addDataRow();
+            }
+        }
+        
+        // 添加数据行
+        function addDataRow() {
+            const tableBody = document.getElementById('table-body');
+            const rowCount = tableBody.children.length + 1;
+            
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>${rowCount}</td>
+                <td><input type="number" class="mass-input" step="0.1" min="0" placeholder="输入质量"></td>
+                <td><input type="number" class="volume-input" step="0.1" min="0" placeholder="输入体积"></td>
+                <td class="density-result">-</td>
+                <td>
+                    <button class="action-button delete-btn delete-row-btn">
+                        <i class="fas fa-trash-alt"></i> 删除
+                    </button>
+                    <button class="action-button confirm-btn calculate-btn">
+                        <i class="fas fa-check"></i> 计算
+                    </button>
+                </td>
+            `;
+            
+            tableBody.appendChild(newRow);
+            
+            // 绑定删除按钮事件
+            newRow.querySelector('.delete-row-btn').addEventListener('click', function() {
+                tableBody.removeChild(newRow);
+                updateRowNumbers();
+            });
+            
+            // 绑定计算按钮事件
+            newRow.querySelector('.calculate-btn').addEventListener('click', function() {
+                calculateDensity(newRow);
+            });
+        }
+        
+        // 更新行号
+        function updateRowNumbers() {
+            const rows = document.querySelectorAll('#table-body tr');
+            rows.forEach((row, index) => {
+                row.cells[0].textContent = index + 1;
+            });
+        }
+        
+        // 计算密度
+        function calculateDensity(row) {
+            const massInput = row.querySelector('.mass-input');
+            const volumeInput = row.querySelector('.volume-input');
+            const densityCell = row.querySelector('.density-result');
+            
+            const mass = parseFloat(massInput.value);
+            const volume = parseFloat(volumeInput.value);
+            
+            if (isNaN(mass) || isNaN(volume) || volume === 0) {
+                densityCell.textContent = '-';
+                return;
+            }
+            
+            const density = mass / volume;
+            densityCell.textContent = density.toFixed(1);
+        }
+        
+        // 加载小组数据
+        function loadGroupData(group) {
+            const tableBody = document.getElementById('table-body');
+            tableBody.innerHTML = '';
+            
+            if (studentData[group] && studentData[group].length > 0) {
+                studentData[group].forEach((data, index) => {
+                    const newRow = document.createElement('tr');
+                    newRow.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td><input type="number" class="mass-input" step="0.1" min="0" value="${data.mass}"></td>
+                        <td><input type="number" class="volume-input" step="0.1" min="0" value="${data.volume}"></td>
+                        <td class="density-result">${data.density.toFixed(1)}</td>
+                        <td>
+                            <button class="action-button delete-btn delete-row-btn">
+                                <i class="fas fa-trash-alt"></i> 删除
+                            </button>
+                            <button class="action-button confirm-btn calculate-btn">
+                                <i class="fas fa-check"></i> 计算
+                            </button>
+                        </td>
+                    `;
+                    
+                    tableBody.appendChild(newRow);
+                    
+                    // 绑定删除按钮事件
+                    newRow.querySelector('.delete-row-btn').addEventListener('click', function() {
+                        tableBody.removeChild(newRow);
+                        updateRowNumbers();
+                    });
+                    
+                    // 绑定计算按钮事件
+                    newRow.querySelector('.calculate-btn').addEventListener('click', function() {
+                        calculateDensity(newRow);
+                    });
+                });
+            } else {
+                addDataRow();
+            }
+        }
+        
+        // 提交数据
+        function submitData() {
+            const tableBody = document.getElementById('table-body');
+            const rows = tableBody.querySelectorAll('tr');
+            const groupData = [];
+            
+            rows.forEach(row => {
+                const massInput = row.querySelector('.mass-input');
+                const volumeInput = row.querySelector('.volume-input');
+                const densityCell = row.querySelector('.density-result');
+                
+                const mass = parseFloat(massInput.value);
+                const volume = parseFloat(volumeInput.value);
+                const density = parseFloat(densityCell.textContent);
+                
+                if (!isNaN(mass) && !isNaN(volume) && !isNaN(density)) {
+                    groupData.push({
+                        mass: mass,
+                        volume: volume,
+                        density: density
+                    });
+                }
+            });
+            
+            if (groupData.length === 0) {
+                alert('请至少输入一组有效数据后再提交！');
+                return;
+            }
+            
+            // 保存数据到本地存储
+            if (!studentData[currentGroup]) {
+                studentData[currentGroup] = [];
+            }
+            
+            studentData[currentGroup] = groupData;
+            localStorage.setItem('densityExperimentData', JSON.stringify(studentData));
+            
+            alert(`第${currentGroup}组数据提交成功！共提交${groupData.length}组数据。`);
+        }
+        
+        // 初始化教师平台
+        function initTeacherPlatform() {
+            const refreshDataBtn = document.getElementById('refresh-data-btn');
+            const refreshChartBtn = document.getElementById('refresh-chart-btn');
+            const fitDataBtn = document.getElementById('fit-data-btn');
+            const averageDensityBtn = document.getElementById('average-density-btn');
+            
+            // 更新数据表格
+            refreshDataBtn.addEventListener('click', updateTeacherDataTable);
+            
+            // 更新图表
+            refreshChartBtn.addEventListener('click', updateChart);
+            
+            // 数据拟合
+            fitDataBtn.addEventListener('click', fitData);
+            
+            // 计算平均密度
+            averageDensityBtn.addEventListener('click', calculateAverageDensity);
+            
+            // 初始加载数据
+            updateTeacherDataTable();
+            initChart();
+        }
+        
+        // 更新教师数据表格
+        function updateTeacherDataTable() {
+            const teacherTableBody = document.getElementById('teacher-table-body');
+            teacherTableBody.innerHTML = '';
+            
+            // 从本地存储重新加载数据
+            studentData = JSON.parse(localStorage.getItem('densityExperimentData')) || {};
+            
+            // 获取所有小组的数据
+            for (let group = 1; group <= 12; group++) {
+                if (studentData[group] && studentData[group].length > 0) {
+                    studentData[group].forEach(data => {
+                        const newRow = document.createElement('tr');
+                        
+                        newRow.innerHTML = `
+                            <td>第${group}组</td>
+                            <td>${data.mass}</td>
+                            <td>${data.volume}</td>
+                            <td>${data.density.toFixed(1)}</td>
+                        `;
+                        
+                        teacherTableBody.appendChild(newRow);
+                    });
+                }
+            }
+            
+            // 如果没有数据，显示提示
+            if (teacherTableBody.children.length === 0) {
+                const newRow = document.createElement('tr');
+                newRow.innerHTML = `
+                    <td colspan="4" style="text-align: center; padding: 30px; color: #777;">
+                        暂无学生提交的数据，请等待学生提交实验数据。
+                    </td>
+                `;
+                teacherTableBody.appendChild(newRow);
+            }
+        }
+        
+        // 初始化图表
+        function initChart() {
+            const ctx = document.getElementById('density-chart').getContext('2d');
+            
+            chart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: []
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: '体积 V/cm³',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            },
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: '质量 m/g',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            },
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    size: 13
+                                },
+                                padding: 20
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `第${context.dataset.label}组: (${context.parsed.x}, ${context.parsed.y})`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            updateChart();
+        }
+        
+        // 更新图表
+        function updateChart() {
+            // 清空图表数据
+            chart.data.datasets = [];
+            
+            // 添加各小组数据
+            for (let group = 1; group <= 12; group++) {
+                if (studentData[group] && studentData[group].length > 0) {
+                    const dataPoints = studentData[group].map(data => ({
+                        x: data.volume,
+                        y: data.mass
+                    }));
+                    
+                    // 为每个小组分配颜色
+                    const hue = (group * 30) % 360;
+                    const color = `hsla(${hue}, 70%, 60%, 0.7)`;
+                    
+                    chart.data.datasets.push({
+                        label: `${group}`,
+                        data: dataPoints,
+                        backgroundColor: color,
+                        borderColor: color.replace('0.7', '1'),
+                        borderWidth: 1,
+                        pointRadius: 6,
+                        pointHoverRadius: 8
+                    });
+                }
+            }
+            
+            chart.update();
+            
+            // 隐藏平均密度显示
+            document.getElementById('average-density-display').classList.remove('active');
+        }
+        
+        // 数据拟合 - 根据密度相似度自动聚类
+        function fitData() {
+            if (chart.data.datasets.length === 0) {
+                alert('暂无数据可进行拟合，请先更新图表。');
+                return;
+            }
+            
+            // 收集所有数据点
+            const allDataPoints = [];
+            
+            for (let group = 1; group <= 12; group++) {
+                if (studentData[group] && studentData[group].length > 0) {
+                    studentData[group].forEach(data => {
+                        allDataPoints.push({
+                            x: data.volume,
+                            y: data.mass,
+                            density: data.density,
+                            group: group
+                        });
+                    });
+                }
+            }
+            
+            if (allDataPoints.length === 0) {
+                alert('没有数据点可进行拟合。');
+                return;
+            }
+            
+            // 过滤掉明显错误的数据（密度小于0.5或大于25）
+            const validDataPoints = allDataPoints.filter(point => 
+                point.density >= 0.5 && point.density <= 25
+            );
+            
+            if (validDataPoints.length < 3) {
+                alert('有效数据点太少，无法进行拟合。请确保数据合理（密度在0.5-25之间）。');
+                return;
+            }
+            
+            // 根据密度值进行聚类（K=3）
+            const clusters = clusterByDensity(validDataPoints, 3);
+            
+            // 为每个聚类添加拟合线（过原点的直线）
+            clusters.forEach((cluster, index) => {
+                if (cluster.points.length > 0) {
+                    // 计算该聚类的平均密度
+                    const avgDensity = cluster.averageDensity;
+                    
+                    // 创建过原点的拟合线数据点
+                    const maxX = Math.max(...cluster.points.map(p => p.x));
+                    const lineData = [
+                        { x: 0, y: 0 },
+                        { x: maxX * 1.2, y: avgDensity * maxX * 1.2 }
+                    ];
+                    
+                    // 添加拟合线到图表
+                    chart.data.datasets.push({
+                        label: `未知物质${index + 1}拟合线 (ρ≈${avgDensity.toFixed(1)})`,
+                        data: lineData,
+                        backgroundColor: 'transparent',
+                        borderColor: clusterColors[index],
+                        borderWidth: 3,
+                        pointRadius: 0,
+                        type: 'line',
+                        fill: false,
+                        tension: 0,
+                        borderDash: index === 0 ? [] : [5, 5]
+                    });
+                }
+            });
+            
+            chart.update();
+            
+            // 显示聚类信息
+            document.getElementById('cluster-info').innerHTML = `
+                <strong><i class="fas fa-info-circle"></i> 数据拟合结果：</strong> 
+                系统已将数据分为${clusters.length}类，每类代表一种未知物质。拟合线为过原点的直线，斜率即为该物质的密度。
+            `;
+        }
+        
+        // 根据密度值进行聚类（简化版K-means）
+        function clusterByDensity(dataPoints, k) {
+            // 提取密度值
+            const densities = dataPoints.map(p => p.density);
+            
+            // 初始化聚类中心（均匀分布在密度范围内）
+            const minDensity = Math.min(...densities);
+            const maxDensity = Math.max(...densities);
+            const centers = [];
+            
+            for (let i = 0; i < k; i++) {
+                centers.push(minDensity + (i * (maxDensity - minDensity) / (k - 1)));
+            }
+            
+            // 迭代聚类
+            let clusters = Array(k).fill().map(() => ({ points: [], averageDensity: 0 }));
+            let changed = true;
+            let iterations = 0;
+            
+            while (changed && iterations < 100) {
+                iterations++;
+                changed = false;
+                
+                // 重置聚类
+                clusters = Array(k).fill().map(() => ({ points: [], averageDensity: 0 }));
+                
+                // 分配每个点到最近的聚类中心
+                dataPoints.forEach(point => {
+                    let minDist = Infinity;
+                    let bestCluster = 0;
+                    
+                    centers.forEach((center, idx) => {
+                        const dist = Math.abs(point.density - center);
+                        if (dist < minDist) {
+                            minDist = dist;
+                            bestCluster = idx;
+                        }
+                    });
+                    
+                    clusters[bestCluster].points.push(point);
+                });
+                
+                // 更新聚类中心
+                centers.forEach((center, idx) => {
+                    if (clusters[idx].points.length > 0) {
+                        const newCenter = clusters[idx].points.reduce((sum, p) => sum + p.density, 0) / clusters[idx].points.length;
+                        
+                        if (Math.abs(newCenter - center) > 0.01) {
+                            changed = true;
+                            centers[idx] = newCenter;
+                        }
+                    }
+                });
+            }
+            
+            // 计算每个聚类的平均密度
+            clusters.forEach((cluster, idx) => {
+                if (cluster.points.length > 0) {
+                    cluster.averageDensity = cluster.points.reduce((sum, p) => sum + p.density, 0) / cluster.points.length;
+                } else {
+                    cluster.averageDensity = centers[idx];
+                }
+            });
+            
+            // 按平均密度排序聚类
+            clusters.sort((a, b) => a.averageDensity - b.averageDensity);
+            
+            return clusters;
+        }
+        
+        // 计算平均密度
+        function calculateAverageDensity() {
+            // 收集所有数据点
+            const allDataPoints = [];
+            
+            for (let group = 1; group <= 12; group++) {
+                if (studentData[group] && studentData[group].length > 0) {
+                    studentData[group].forEach(data => {
+                        allDataPoints.push({
+                            x: data.volume,
+                            y: data.mass,
+                            density: data.density,
+                            group: group
+                        });
+                    });
+                }
+            }
+            
+            if (allDataPoints.length === 0) {
+                alert('没有数据可计算平均密度。');
+                return;
+            }
+            
+            // 过滤掉明显错误的数据
+            const validDataPoints = allDataPoints.filter(point => 
+                point.density >= 0.5 && point.density <= 25
+            );
+            
+            if (validDataPoints.length === 0) {
+                alert('没有有效数据可计算平均密度。请确保数据合理（密度在0.5-25之间）。');
+                return;
+            }
+            
+            // 根据密度值进行聚类（K=3）
+            const clusters = clusterByDensity(validDataPoints, 3);
+            
+            // 显示平均密度结果
+            const averageResults = document.getElementById('average-results');
+            averageResults.innerHTML = '';
+            
+            clusters.forEach((cluster, index) => {
+                if (cluster.points.length > 0) {
+                    const materialDiv = document.createElement('div');
+                    materialDiv.className = 'material-average';
+                    materialDiv.innerHTML = `
+                        <div class="material-name"><span class="color-indicator" style="background-color: ${clusterColors[index]}"></span>未知物质${index + 1}</div>
+                        <div class="density-value">${cluster.averageDensity.toFixed(1)} g·cm⁻³</div>
+                        <div style="font-size: 0.9rem; color: #666;">${cluster.points.length} 个数据点</div>
+                    `;
+                    
+                    averageResults.appendChild(materialDiv);
+                }
+            });
+            
+            // 显示平均密度结果
+            document.getElementById('average-density-display').classList.add('active');
+        }
+        
+        // 切换平台
+        document.getElementById('student-tab').addEventListener('click', function() {
+            document.getElementById('student-tab').classList.add('active');
+            document.getElementById('teacher-tab').classList.remove('active');
+            document.getElementById('student-platform').classList.add('active');
+            document.getElementById('teacher-platform').classList.remove('active');
+        });
+        
+        document.getElementById('teacher-tab').addEventListener('click', function() {
+            document.getElementById('teacher-tab').classList.add('active');
+            document.getElementById('student-tab').classList.remove('active');
+            document.getElementById('teacher-platform').classList.add('active');
+            document.getElementById('student-platform').classList.remove('active');
+            
+            // 更新教师平台数据
+            updateTeacherDataTable();
+            updateChart();
+        });
+        
+        // 初始化应用
+        document.addEventListener('DOMContentLoaded', function() {
+            initStudentPlatform();
+            initTeacherPlatform();
+        });
+    </script>
+</body>
+</html>

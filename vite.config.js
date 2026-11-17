@@ -1,5 +1,10 @@
 import { fileURLToPath, URL } from 'node:url';
+import { existsSync, realpathSync } from 'node:fs';
 import { defineConfig, loadEnv } from 'vite';
+
+const projectRoot = fileURLToPath(new URL('.', import.meta.url));
+const nodeModulesPath = fileURLToPath(new URL('./node_modules', import.meta.url));
+const nodeModulesRealPath = existsSync(nodeModulesPath) ? realpathSync(nodeModulesPath) : nodeModulesPath;
 import vue2 from '@vitejs/plugin-vue2';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
 
@@ -61,7 +66,12 @@ export default defineConfig(({ mode, command }) => {
         ? { 'Content-Security-Policy': "connect-src 'self' ws: wss:; frame-src 'none'; img-src 'self' data: blob:" }
         : {},
       // 允许通过 127.0.0.1、localhost 等本地地址访问开发服务器
-      allowedHosts: ['localhost', '127.0.0.1']
+      // .v0.build / .vercel.run：v0 在线预览域名（沙箱子域名会随会话变化，用前导点匹配其子域名）
+      allowedHosts: ['localhost', '127.0.0.1', '.v0.build', '.vercel.run'],
+      fs: {
+        // node_modules 可能是指向项目外目录的软链接（如 v0 沙箱），需放行其真实路径以加载 element-ui 字体等静态资源
+        allow: [projectRoot, nodeModulesRealPath]
+      }
     },
 
     build: {
