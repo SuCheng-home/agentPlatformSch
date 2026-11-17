@@ -5,10 +5,13 @@
 
       <header class="hero__bar">
         <div class="hero__brand">
-          <img :src="logo" alt="南京市科利华中学校徽" width="44" height="44" />
+          <span class="hero__logo"><img :src="logo" alt="南京市科利华中学校徽" width="34" height="31" /></span>
           <span class="hero__school">南京市科利华中学</span>
         </div>
-        <user-menu />
+        <div class="hero__right">
+          <p class="hero__greet">{{ today }} · {{ teacherName }}，{{ greeting }}</p>
+          <user-menu />
+        </div>
       </header>
 
       <div class="hero__center">
@@ -21,8 +24,6 @@
           汇聚教育智慧<span class="gap" aria-hidden="true" />赋能师生成长
         </p>
       </div>
-
-      <p class="hero__greet">{{ today }} · {{ teacherName }}，{{ greeting }}</p>
     </section>
 
     <nav class="entries" aria-label="三大矩阵入口">
@@ -51,7 +52,7 @@
 <script>
 import KlhIcon from '../components/KlhIcon.vue';
 import UserMenu from '../components/user-menu.vue';
-import logo from '../assets/logo.png';
+import logo from '../assets/logo-klh.png';
 import heroImg from '../assets/home-hero-matrix.webp';
 import iconSubject from '../assets/icons/mx-subject.webp';
 import iconEducation from '../assets/icons/mx-education.webp';
@@ -75,7 +76,8 @@ export default {
   },
   computed: {
     extras() {
-      return navItems().filter((item) => !item.matrix && item.to !== '/kelihua/home');
+      const hidden = ['/kelihua/home', '/kelihua/prompts', '/kelihua/build'];
+      return navItems().filter((item) => !item.matrix && !hidden.includes(item.to));
     },
     teacherName() {
       const name = getters.roleInfo().name;
@@ -98,27 +100,28 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+/* 上 1/3 主视觉，下 2/3 三大矩阵入口 */
 .home {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: minmax(210px, 1fr) minmax(360px, 2fr) auto;
   gap: 20px;
   max-width: 1440px;
-  min-height: 100vh;
+  height: 100vh;
+  min-height: 640px;
   margin: 0 auto;
   padding: clamp(16px, 2vw, 28px);
 }
 
-/* 上：科智汇主视觉，深校徽蓝底，插画在右侧淡入 */
+/* 科智汇主视觉，深校徽蓝底，插画在右侧淡入 */
 .hero {
   position: relative;
   isolation: isolate;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  flex: 1;
-  gap: 28px;
-  min-height: 380px;
-  padding: clamp(20px, 2.4vw, 32px) clamp(24px, 3.6vw, 56px);
+  gap: 16px;
+  min-height: 0;
+  padding: clamp(16px, 2vw, 26px) clamp(24px, 3.6vw, 56px) clamp(20px, 2.6vw, 34px);
   border-radius: 24px;
   background: var(--klh-blue-deep);
   color: var(--klh-white);
@@ -158,12 +161,23 @@ export default {
   align-items: center;
   gap: 12px;
 
-  img {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    box-shadow: 0 0 0 2px var(--klh-white);
-  }
+}
+
+.hero__logo {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--klh-white);
+
+  img { width: 34px; height: 31px; object-fit: contain; }
+}
+
+.hero__right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
 .hero__school {
@@ -176,18 +190,18 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: clamp(14px, 1.8vw, 24px);
+  gap: clamp(10px, 1.2vw, 16px);
 }
 
 .hero__title {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
-  gap: 4px 28px;
+  align-items: center;
+  gap: 4px 20px;
 }
 
 .hero__zh {
-  font-size: clamp(76px, 9vw, 148px);
+  font-size: clamp(48px, 5.4vw, 88px);
   line-height: 1;
   white-space: nowrap;
   letter-spacing: 0.04em;
@@ -199,7 +213,7 @@ export default {
   padding: 6px 16px;
   border-radius: 10px;
   background: var(--klh-orange);
-  font-size: clamp(20px, 2.2vw, 30px);
+  font-size: clamp(16px, 1.6vw, 22px);
   font-weight: 800;
   letter-spacing: 0.24em;
   line-height: 1.3;
@@ -222,7 +236,7 @@ export default {
 .hero__greet {
   font-size: 14px;
   letter-spacing: 0.06em;
-  opacity: 0.88;
+  text-shadow: 0 1px 6px rgba(8, 20, 70, 0.8);
 }
 
 /* 下：三大矩阵入口，实色卡片 + 白字 */
@@ -230,18 +244,22 @@ export default {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 20px;
+  min-height: 0;
 }
 
 .entry {
   --tone: var(--klh-orange);
   --tone-deep: #a94f05;
   position: relative;
-  display: flex;
-  align-items: center;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: 1fr auto;
+  align-items: end;
   gap: 18px;
-  min-height: clamp(132px, 20vh, 188px);
-  padding: 22px 24px;
-  border-radius: 20px;
+  min-height: 0;
+  padding: clamp(22px, 2.4vw, 34px);
+  border-radius: 24px;
+  overflow: hidden;
   background: linear-gradient(135deg, var(--tone) 0%, var(--tone-deep) 100%);
   color: var(--klh-white);
   box-shadow: 0 18px 32px -22px var(--tone-deep);
@@ -263,28 +281,31 @@ export default {
 }
 
 .entry__icon {
-  flex-shrink: 0;
+  grid-column: 1 / -1;
+  align-self: start;
   display: grid;
   place-items: center;
-  width: 80px;
-  height: 80px;
+  width: clamp(96px, 9vw, 136px);
+  height: clamp(96px, 9vw, 136px);
   border-radius: 50%;
   background: var(--klh-white);
-  box-shadow: 0 10px 20px -10px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 14px 28px -14px rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s;
 
-  img { width: 64px; height: 64px; object-fit: contain; }
+  img { width: 78%; height: 78%; object-fit: contain; }
+
+  .entry:hover & { transform: scale(1.05) rotate(-3deg); }
 }
 
 .entry__text {
   display: flex;
-  flex: 1;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   min-width: 0;
 }
 
 .entry__title {
-  font-size: clamp(19px, 1.6vw, 24px);
+  font-size: clamp(22px, 2vw, 30px);
   font-weight: 800;
   letter-spacing: 0.04em;
   line-height: 1.3;
@@ -349,9 +370,13 @@ export default {
   to { opacity: 1; transform: none; }
 }
 
-@media (max-width: 1080px) {
+@media (max-width: 860px) {
+  .home { height: auto; min-height: 100vh; grid-template-rows: auto auto auto; }
+  .hero { min-height: 240px; }
+  .hero__greet { display: none; }
   .entries { grid-template-columns: 1fr; gap: 14px; }
-  .entry { min-height: 108px; }
+  .entry { grid-template-columns: auto minmax(0, 1fr) auto; grid-template-rows: auto; align-items: center; min-height: 120px; }
+  .entry__icon { grid-column: auto; align-self: center; width: 80px; height: 80px; }
   .hero__art { width: 100%; opacity: 0.6; }
 }
 
@@ -360,7 +385,7 @@ export default {
   .hero__motto .rule { display: none; }
   .hero__motto { white-space: normal; }
   .entry { gap: 14px; padding: 16px; }
-  .entry__icon { width: 64px; height: 64px; img { width: 52px; height: 52px; } }
+  .entry__icon { width: 64px; height: 64px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

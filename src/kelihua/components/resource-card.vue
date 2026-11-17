@@ -113,10 +113,9 @@ export default {
   height: 44px;
   border-radius: 12px;
 
-  color: var(--klh-white);
-  .res-card--agent & { background: var(--klh-blue); }
-  .res-card--tool & { background: var(--klh-orange); }
-  .res-card--prompt & { background: var(--klh-ink); }
+  .res-card--agent & { background: var(--klh-blue-tint); color: var(--klh-blue); }
+  .res-card--tool & { background: var(--klh-orange-tint); color: var(--klh-orange); }
+  .res-card--prompt & { background: var(--klh-ink-tint); color: var(--klh-ink); }
 }
 
 .res-card__code {

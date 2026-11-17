@@ -104,8 +104,9 @@
     white-space: nowrap;
     &:hover { color: var(--klh-ink); background: var(--klh-ink-tint); }
     &.is-active {
-      background: var(--klh-ink);
-      color: var(--klh-white);
+      background: var(--klh-blue-tint);
+      color: var(--klh-blue);
+      font-weight: 600;
     }
   }
 

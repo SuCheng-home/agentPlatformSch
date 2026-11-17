@@ -1,18 +1,6 @@
 <template>
   <div class="klh-page">
-    <page-head
-      glyph="育"
-      eyebrow="育人管理矩阵"
-      title="围绕育人与学校管理的智能助手"
-      desc="面向班主任、德育、心理、教务与行政岗位，按业务领域组织管理类智能体与工具。标注「规划中」的方向将在后续逐步细化建设。"
-    >
-      <label class="klh-search">
-        <klh-icon name="search" :size="16" />
-        <span class="sr-only">搜索育人应用</span>
-        <input v-model.trim="keyword" type="search" placeholder="搜索育人管理应用" />
-      </label>
-    </page-head>
-
+    <h1 class="sr-only">育人管理矩阵</h1>
     <div class="edu">
       <nav class="edu__domains" aria-label="育人领域">
         <button
@@ -44,15 +32,22 @@
             <h2>{{ current ? current.label : '全部育人管理应用' }}</h2>
             <p>{{ current ? current.hint : '班主任工作、德育活动、心理健康、家校沟通、综合评价、教务与行政' }}</p>
           </div>
-          <div class="edu__split" role="group" aria-label="类型筛选">
-            <button
-              v-for="t in typeOptions"
-              :key="t.key"
-              type="button"
-              :class="['klh-chip', { 'is-active': type === t.key }]"
-              :aria-pressed="String(type === t.key)"
-              @click="type = t.key"
-            >{{ t.label }} {{ typeCount(t.key) }}</button>
+          <div class="edu__tools">
+            <div class="edu__split" role="group" aria-label="类型筛选">
+              <button
+                v-for="t in typeOptions"
+                :key="t.key"
+                type="button"
+                :class="['klh-chip', { 'is-active': type === t.key }]"
+                :aria-pressed="String(type === t.key)"
+                @click="type = t.key"
+              >{{ t.label }} {{ typeCount(t.key) }}</button>
+            </div>
+            <label class="klh-search">
+              <klh-icon name="search" :size="16" />
+              <span class="sr-only">搜索育人应用</span>
+              <input v-model.trim="keyword" type="search" placeholder="搜索育人管理应用" />
+            </label>
           </div>
         </div>
 
@@ -75,14 +70,13 @@
 </template>
 
 <script>
-import PageHead from '../components/PageHead.vue';
 import ResourceCard from '../components/resource-card.vue';
 import KlhIcon from '../components/KlhIcon.vue';
 import state, { getters } from '../store';
 
 export default {
   name: 'KlhEducationMatrix',
-  components: { PageHead, ResourceCard, KlhIcon },
+  components: { ResourceCard, KlhIcon },
   data() {
     return {
       state,
@@ -145,15 +139,14 @@ export default {
 
 .edu__domains {
   position: sticky;
-  top: 24px;
+  top: 92px;
   display: flex;
   flex-direction: column;
   gap: 2px;
   padding: 10px;
   border-radius: 18px;
   background: var(--klh-white);
-  border: 1.5px solid var(--klh-line-strong);
-  box-shadow: var(--klh-shadow);
+  border: 1px solid var(--klh-line);
 }
 
 .domain {
@@ -173,10 +166,9 @@ export default {
 
   &:hover { background: var(--klh-ink-tint); }
   &.is-active {
-    background: var(--klh-blue);
-    color: var(--klh-white);
-    .domain__count { background: rgba(255, 255, 255, 0.2); color: var(--klh-white); }
-    .domain__plan { color: rgba(255, 255, 255, 0.8); border-color: rgba(255, 255, 255, 0.4); }
+    background: var(--klh-blue-tint);
+    color: var(--klh-blue);
+    .domain__count { background: var(--klh-white); color: var(--klh-blue); }
   }
 }
 
@@ -216,12 +208,18 @@ export default {
   margin-bottom: 20px;
   padding: 22px 24px;
   border-radius: 18px;
-  background: linear-gradient(110deg, var(--klh-blue) 0%, var(--klh-blue-deep) 100%);
-  color: var(--klh-white);
-  box-shadow: 0 18px 32px -24px var(--klh-blue-deep);
+  background: var(--klh-white);
+  border: 1px solid var(--klh-line);
 
-  h2 { font-size: 24px; font-weight: 800; }
-  p { margin-top: 4px; font-size: 14px; color: rgba(255, 255, 255, 0.88); }
+  h2 { font-size: 22px; font-weight: 800; color: var(--klh-blue-deep); }
+  p { margin-top: 4px; font-size: 14px; color: var(--klh-muted); }
+}
+
+.edu__tools {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .edu__split {
@@ -229,12 +227,10 @@ export default {
   gap: 4px;
   padding: 4px;
   border-radius: 999px;
-  background: rgba(0, 0, 0, 0.22);
+  background: var(--klh-ink-tint);
 
   .klh-chip {
-    color: rgba(255, 255, 255, 0.9);
-    &:hover { background: rgba(255, 255, 255, 0.14); color: var(--klh-white); }
-    &.is-active { background: var(--klh-white); color: var(--klh-blue-deep); font-weight: 700; }
+    &.is-active { background: var(--klh-white); color: var(--klh-blue); box-shadow: 0 1px 3px rgba(40, 49, 73, 0.1); }
   }
 }
 
@@ -247,15 +243,14 @@ export default {
   align-items: center;
   gap: 10px;
   margin-bottom: 12px;
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 800;
-  color: var(--klh-blue-deep);
 
   &::after {
     content: '';
     flex: 1;
-    height: 1.5px;
-    background: var(--klh-line-strong);
+    height: 1px;
+    background: var(--klh-line);
   }
 }
 

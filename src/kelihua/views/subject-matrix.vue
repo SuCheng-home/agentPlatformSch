@@ -150,7 +150,7 @@ export default {
       const el = document.getElementById(`mod-${key}`);
       if (!el) return;
       const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 24, behavior: reduce ? 'auto' : 'smooth' });
+      window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 92, behavior: reduce ? 'auto' : 'smooth' });
     }
   }
 };
@@ -158,13 +158,12 @@ export default {
 
 <style lang="scss" scoped>
 /* 模块色：刻意避开橙（工具）与蓝（智能体），资源类型的颜色只出现在卡片上 */
-/* 高对比版：模块色块改为实色渐变 + 白字 */
-.tone-teal { --tone: #0a6d67; --tone-deep: #064843; }
-.tone-forest { --tone: #2f6a33; --tone-deep: #1b4420; }
-.tone-brick { --tone: #9a2e2e; --tone-deep: #641a1a; }
-.tone-plum { --tone: #6e2f5d; --tone-deep: #45193a; }
-.tone-slate { --tone: #2f3b58; --tone-deep: #1a2238; }
-.tone-stone { --tone: #4f4943; --tone-deep: #2f2b27; }
+.tone-teal { --tone: #0e7c76; --tint: #e4f3f1; }
+.tone-forest { --tone: #3b7a3f; --tint: #e9f2e6; }
+.tone-brick { --tone: #a83a3a; --tint: #f8e9e7; }
+.tone-plum { --tone: #7d3c6b; --tint: #f4e9f1; }
+.tone-slate { --tone: #3d4a66; --tint: #eaedf3; }
+.tone-stone { --tone: #5c564f; --tint: #efece7; }
 
 .sm-head {
   display: flex;
@@ -223,7 +222,7 @@ export default {
   overflow-x: auto;
   border-radius: 999px;
   background: var(--klh-white);
-  box-shadow: inset 0 0 0 1.5px var(--klh-line-strong), var(--klh-shadow);
+  box-shadow: inset 0 0 0 1px var(--klh-line);
   scrollbar-width: none;
   &::-webkit-scrollbar { display: none; }
 }
@@ -249,7 +248,7 @@ export default {
   small { font-size: 11px; font-weight: 400; letter-spacing: 0; }
 
   &:hover:not(:disabled):not(.is-active) { background: var(--klh-ink-tint); }
-  &.is-active { background: var(--klh-ink); color: var(--klh-white); }
+  &.is-active { background: var(--klh-blue-tint); color: var(--klh-blue); }
   &:disabled { color: var(--klh-faint); font-weight: 400; cursor: not-allowed; }
 }
 
@@ -271,31 +270,31 @@ export default {
   min-height: 168px;
   padding: 18px 20px;
   border-radius: 18px;
-  background: linear-gradient(140deg, var(--tone) 0%, var(--tone-deep) 100%);
-  color: var(--klh-white);
-  box-shadow: 0 14px 28px -20px var(--tone-deep);
+  background: var(--tint);
+  color: var(--tone);
   overflow: hidden;
   isolation: isolate;
   transition: transform 0.2s, box-shadow 0.2s;
 
   &:hover {
     transform: translateY(-3px);
-    box-shadow: 0 20px 34px -18px var(--tone-deep);
+    box-shadow: 0 16px 28px -20px var(--tone);
   }
-  &:hover .sm-module__art { transform: scale(1.06); }
+  &:hover .sm-module__art { transform: scale(1.06) translateY(-2px); }
 }
 
-/* 配图为白底 3D 插画，放进白色圆牌，在深色块上保持清晰 */
+/* 配图为白底 3D 插画，正片叠底后融进模块色块 */
 .sm-module__art {
   position: absolute;
-  top: 14px;
-  right: 14px;
-  width: 92px;
-  height: 92px;
-  border-radius: 50%;
-  background: var(--klh-white);
-  object-fit: cover;
-  box-shadow: 0 10px 20px -10px rgba(0, 0, 0, 0.5);
+  top: -6px;
+  right: -28px;
+  z-index: -1;
+  width: 78%;
+  height: auto;
+  mix-blend-mode: multiply;
+  filter: brightness(1.07);
+  -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 55%, transparent 100%);
+  mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 55%, transparent 100%);
   transition: transform 0.35s;
 }
 
@@ -311,7 +310,7 @@ export default {
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.06em;
-  opacity: 0.9;
+  opacity: 0.8;
 }
 
 .sm-block {
@@ -327,11 +326,21 @@ export default {
   gap: 16px;
   min-height: 112px;
   margin-bottom: 20px;
-  padding: 0 14px 0 28px;
+  padding: 0 0 0 28px;
   border-radius: 18px;
-  background: linear-gradient(100deg, var(--tone) 0%, var(--tone-deep) 100%);
-  color: var(--klh-white);
+  background: var(--tint);
+  color: var(--tone);
   overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 8px;
+    background: var(--tone);
+  }
 }
 
 .sm-block__text {
@@ -355,18 +364,18 @@ export default {
   gap: 6px 16px;
   font-size: 14px;
   font-weight: 600;
-  color: var(--klh-white);
-  opacity: 0.9;
+  color: var(--klh-muted);
 }
 
 .sm-block__art {
-  flex-shrink: 0;
-  width: 156px;
-  height: 84px;
-  border-radius: 14px;
-  background: var(--klh-white);
+  align-self: stretch;
+  width: auto;
+  height: 112px;
   object-fit: cover;
-  box-shadow: 0 10px 20px -12px rgba(0, 0, 0, 0.5);
+  mix-blend-mode: multiply;
+  filter: brightness(1.07);
+  -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 50%, transparent 100%);
+  mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 50%, transparent 100%);
 }
 
 .sm-grid {
@@ -395,8 +404,7 @@ export default {
   .sm-module__label { font-size: 22px; }
   .sm-block { margin-top: 32px; }
   .sm-block__title { font-size: 26px; }
-  .sm-block__art { width: 112px; height: 64px; }
-  .sm-module__art { width: 64px; height: 64px; top: 10px; right: 10px; }
+  .sm-block__art { height: 96px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

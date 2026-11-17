@@ -1,5 +1,6 @@
 <template>
-  <div class="klh klh-login">
+  <div class="klh klh-login" :style="{ '--campus': `url(${campus})`, '--school-name': `url(${schoolName})` }">
+    <div class="klh-login__photo" aria-hidden="true" />
     <div class="klh-login__wash" aria-hidden="true" />
     <svg class="klh-login__wave" viewBox="0 0 1440 220" preserveAspectRatio="none" aria-hidden="true">
       <path class="wave-orange" d="M0 92 C 320 40 620 150 960 96 C 1180 62 1320 70 1440 84" />
@@ -7,10 +8,10 @@
     </svg>
 
     <header class="klh-login__brand">
-      <img :src="logo" alt="南京市科利华中学校徽" width="64" height="64" />
+      <img class="brand-logo" :src="logo" alt="南京市科利华中学校徽" width="72" height="66" />
       <span class="divider" aria-hidden="true" />
       <div>
-        <p class="school-cn">南京市科利华中学</p>
+        <p class="school-cn" role="img" aria-label="南京市科利华中学" />
         <p class="school-en">NANJING KELIHUA MIDDLE SCHOOL</p>
       </div>
     </header>
@@ -104,7 +105,9 @@
 import BrushKe from '../components/brush-ke.vue';
 import KlhIcon from '../components/KlhIcon.vue';
 import QrcodeLogin from '@/views/desktop-app/components/QrcodeLogin.vue';
-import logo from '../assets/logo.png';
+import logo from '../assets/logo-klh.png';
+import schoolName from '../assets/school-name.png';
+import campus from '../assets/campus-bg.webp';
 import { getToken } from '@/utils/auth';
 import state, { actions, DEMO_MODE, ROLES } from '../store';
 
@@ -112,7 +115,7 @@ export default {
   name: 'KlhLogin',
   components: { BrushKe, KlhIcon, QrcodeLogin },
   data() {
-    return { logo, roles: ROLES, role: state.session.role, demoMode: DEMO_MODE, replayKey: 0 };
+    return { logo, schoolName, campus, roles: ROLES, role: state.session.role, demoMode: DEMO_MODE, replayKey: 0 };
   },
   created() {
     if (!DEMO_MODE) {
@@ -148,7 +151,25 @@ export default {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(160deg, #fffaf3 0%, #fdf1e2 55%, #fbe7cf 100%);
+  background: #fdf3e6;
+}
+
+/* 校园实景虚化打底，再罩一层暖白，保证文字与登录卡片清晰 */
+.klh-login__photo {
+  position: absolute;
+  inset: -24px;
+  background:
+    linear-gradient(160deg, rgba(255, 250, 243, 0.86) 0%, rgba(253, 243, 230, 0.62) 50%, rgba(251, 236, 216, 0.5) 100%),
+    var(--campus) center 40% / cover no-repeat;
+  filter: blur(4px) saturate(0.9);
+  transform: scale(1.04);
+  opacity: 0;
+  animation: klh-photo-in 1.4s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes klh-photo-in {
+  to { opacity: 1; transform: none; }
 }
 
 /* 仅保留一处柔和的暖色光晕，背景整体保持素净 */
@@ -198,14 +219,15 @@ export default {
   opacity: 0;
   animation: klh-fade-down 0.7s 0.1s ease-out forwards;
 
-  img { width: 64px; height: 64px; border-radius: 50%; box-shadow: 0 4px 14px rgba(20, 50, 154, 0.18); }
-  .divider { width: 1px; height: 44px; background: var(--klh-line-strong); }
+  .brand-logo { width: 72px; height: 66px; object-fit: contain; filter: drop-shadow(0 4px 10px rgba(72, 58, 140, 0.18)); }
+  .divider { width: 1px; height: 48px; background: var(--klh-line-strong); }
+  /* 校名为书法题字，用蒙版着色以便统一墨色 */
   .school-cn {
-    font-size: 26px;
-    font-weight: 800;
-    letter-spacing: 0.22em;
-    color: var(--klh-blue-deep);
-    line-height: 1.2;
+    width: 300px;
+    height: 42px;
+    background: var(--klh-ink);
+    -webkit-mask: var(--school-name) left center / contain no-repeat;
+    mask: var(--school-name) left center / contain no-repeat;
   }
   .school-en {
     margin-top: 4px;
@@ -508,9 +530,9 @@ export default {
 @media (max-width: 560px) {
   .klh-login__brand {
     gap: 12px;
-    img { width: 48px; height: 48px; }
+    .brand-logo { width: 52px; height: 48px; }
     .divider { height: 34px; }
-    .school-cn { font-size: 19px; letter-spacing: 0.14em; }
+    .school-cn { width: 200px; height: 28px; }
     .school-en { font-size: 10px; letter-spacing: 0.08em; }
   }
   .login-card { padding: 24px 20px; }
